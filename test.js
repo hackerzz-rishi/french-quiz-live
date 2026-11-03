@@ -3,7 +3,7 @@ const WebSocket = require("ws");
 process.env.PORT = 3917;
 const { server } = require("./server.js");
 const url = "ws://localhost:3917/ws";
-const open = () => new Promise(r => { const w = new WebSocket(url); w.last = null; w.on("message", d => { const m = JSON.parse(d); if (m.type === "peers") w.last = m.peers; }); w.on("open", () => r(w)); });
+const open = () => new Promise(r => { const w = new WebSocket(url); w.last = null; w.on("message", d => { const m = JSON.parse(d); if (m.type === "peers") w.last = m.peers; if (m.type === "hello") w.hello = m; }); w.on("open", () => r(w)); });
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const ok = (c, msg) => { console.log((c ? "PASS " : "FAIL ") + msg); if (!c) process.exitCode = 1; };
 (async () => {
@@ -12,6 +12,7 @@ const ok = (c, msg) => { console.log((c ? "PASS " : "FAIL ") + msg); if (!c) pro
   b.send(JSON.stringify({ type: "presence", patch: { n: "Friend", t: 2, st: "lobby", rc: "paris7" } }));
   c.send(JSON.stringify({ type: "presence", patch: { n: "Other", t: 3, st: "lobby", rc: "rome" } }));
   await wait(200);
+  ok(a.hello && Math.abs(a.hello.now - Date.now()) < 5000, "hello carries server clock");
   ok(a.last.length === 2 && b.last.length === 2, "two players in paris7 see each other");
   ok(c.last.length === 1, "other room is isolated");
   ok(a.last[0].isMe && a.last[0].presence.n === "Deepak", "self entry first");
