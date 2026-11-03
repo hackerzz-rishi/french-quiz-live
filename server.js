@@ -51,7 +51,7 @@ wss.on("connection", (ws) => {
   if (clients.size >= MAX_CLIENTS) { ws.close(1013, "busy"); return; }
   const c = { id: "p" + (nextId++).toString(36), ws, presence: {}, alive: true };
   clients.set(c.id, c);
-  send(c, { type: "hello", id: c.id });
+  send(c, { type: "hello", id: c.id, now: Date.now() });
   ws.on("pong", () => { c.alive = true; });
   ws.on("message", (data) => {
     c.alive = true;
