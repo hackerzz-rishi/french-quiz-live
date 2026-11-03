@@ -66,7 +66,11 @@ select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);bor
 .fld{display:grid;gap:4px;margin-bottom:10px}
 .fld label{color:var(--muted);font-size:.9rem}
 .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 14px}
-.bar i{display:block;height:100%;width:100%;background:var(--accent)}
+.bar i{display:block;height:100%;width:100%;background:var(--accent);transition:width .2s linear}
+.bar.urgent i{background:var(--bad)}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);min-width:3.2em}
+.timer.urgent{color:var(--bad)}
+.snd{margin-left:auto;padding:2px 10px;font-size:.85rem}
 .pl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .pl span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.92rem}
 .pl span.me{border-color:var(--accent)}
@@ -181,14 +185,14 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
     <div class="fld"><label for="gName">Your name</label><input type="text" id="gName" maxlength="16" autocomplete="off"></div>
     <div class="row"><button class="primary" id="gCreateBtn">Create a new game</button></div>
     <p class="or">or join a friend's game</p>
-    <div class="fld"><label for="gCode">Game code</label><input type="text" id="gCode" maxlength="20" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="For example K7MP2"></div>
+    <div class="fld"><label for="gCode">Game code</label><input type="text" id="gCode" maxlength="20" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="5 characters, for example K7MP2"></div>
     <div class="row"><button id="gJoinBtn">Join game</button><button id="gSoloBtn">Play solo</button></div>
     <div class="fb" id="gMsg" aria-live="polite"></div>
     <p class="hint">No sign-in needed. The first visit after a quiet period can take up to a minute to connect.</p>
   </div>
 
   <div id="gLobby" class="card" hidden>
-    <p class="hint" style="margin:0">Game code</p>
+    <div class="stats" style="margin:0"><span>Game code</span><button class="snd" type="button" aria-label="Sound on or off"></button></div>
     <p class="bigcode" id="gRoomCode"></p>
     <div class="row" id="gShare"><button id="gCopyLink">Copy invite link</button></div>
     <p class="hint" id="gShareMsg"></p>
@@ -202,6 +206,7 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
       <div class="fld"><label for="cSet">Verbs</label><select id="cSet"><option value="all">Regular and irregular</option><option value="irr">Irregular only</option><option value="reg">Regular only</option></select></div>
       <div class="fld"><label for="cKind">Questions</label><select id="cKind"><option value="mix">Mixed</option><option value="form">Conjugation</option><option value="mean">Meaning</option></select></div>
       <div class="fld"><label for="cN">Number of questions</label><select id="cN"><option>10</option><option>15</option><option>20</option></select></div>
+      <div class="fld"><label for="cQt">Time per question</label><select id="cQt"><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="20" selected>20 seconds</option><option value="30">30 seconds</option></select></div>
       <div class="row"><button class="primary" id="gStart" disabled>Waiting for friends to join…</button></div>
     </div>
     <p class="hint" id="gWait" hidden></p>
@@ -209,8 +214,8 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
   </div>
 
   <div id="gQ" class="card" hidden>
-    <div class="stats"><span id="gProg"></span><span>Score <b id="gScore">0</b></span></div>
-    <div class="bar"><i id="gBarI"></i></div>
+    <div class="stats"><span id="gProg"></span><span>⏱ <span class="timer" id="gTime"></span></span><span>Score <b id="gScore">0</b></span><button class="snd" type="button" aria-label="Sound on or off"></button></div>
+    <div class="bar" id="gBar"><i id="gBarI"></i></div>
     <p class="verb sm" id="gVerb"></p>
     <p class="eng" id="gEng"></p>
     <p class="q" id="gAsk"></p>
@@ -575,7 +580,26 @@ window.claude={use:async function(n){
 (function(){
 var $=function(i){return document.getElementById(i)};
 var GP=["je","tu","il/elle","nous","vous","ils/elles"];
-var QT=20000,CAP=28000;
+
+/* ---------- sound effects (generated in the browser, no files) ---------- */
+var SND=(function(){var ctx=null,on=true;try{on=localStorage.getItem("fq-sound")!=="off"}catch(e){}
+  function ac(){try{if(!ctx){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C()}if(ctx.state==="suspended")ctx.resume()}catch(e){return null}return ctx}
+  function tone(f,d,type,vol,at){if(!on)return;var c=ac();if(!c)return;var t=c.currentTime+(at||0),o=c.createOscillator(),g=c.createGain();
+    o.type=type||"sine";o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||0.2,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.03)}
+  function seq(fs,step,d,type,vol){fs.forEach(function(f,i){tone(f,d,type,vol,i*step)})}
+  function label(){var b=document.querySelectorAll(".snd");for(var i=0;i<b.length;i++){b[i].textContent=on?"🔊 Sound on":"🔇 Sound off";b[i].setAttribute("aria-pressed",on?"true":"false")}}
+  return{unlock:function(){if(on)ac()},label:label,
+    toggle:function(){on=!on;try{localStorage.setItem("fq-sound",on?"on":"off")}catch(e){}label();if(on){ac();tone(660,.1,"sine",.15)}},
+    tick:function(){tone(1046,.06,"square",.05)},
+    count:function(){tone(523,.16,"sine",.2)},
+    go:function(){tone(784,.32,"sine",.25)},
+    ok:function(){seq([659,988],.09,.18,"sine",.22)},
+    bad:function(){tone(180,.32,"sawtooth",.1)},
+    timeup:function(){seq([440,311],.14,.25,"triangle",.2)},
+    join:function(){seq([587,880],.07,.12,"sine",.12)},
+    win:function(){seq([523,659,784,1047],.13,.28,"sine",.22)},
+    end:function(){seq([523,440,392],.16,.3,"triangle",.18)}}})();
 var ROOM=null,UNSUB=null,GS={screen:"join",G:null,cfg:null,n:0,qs:[],i:-1,shownAt:0,answered:false,picked:-1,score:0,correct:0,ms:0,ignoreG:null,adv:false,tick:null,pending:null};
 window.__gs=GS;
 
@@ -635,18 +659,29 @@ function updConn(){var b=$("gConn");if(ROOM&&!GS.solo){var all=0;try{all=ROOM.pe
 function monitor(){clearInterval(GS.mon);GS.mon=setInterval(function(){if(!ROOM)return;
   var c=true;try{c=ROOM.connected?ROOM.connected():true}catch(e){}
   if(!c){if(!GS.downSince)GS.downSince=Date.now()}else GS.downSince=0;updConn()},1000)}
-function enterRoom(room,code,name,creator){ROOM=room;GS.solo=!!room.stub;GS.connErr=null;GS.downSince=0;GS.joinedAt=Date.now();$("gRoomCode").textContent=code.toUpperCase();$("gShare").hidden=GS.solo;$("gShareMsg").textContent=GS.solo?"":(creator?"Send this code (or the invite link) to your friends. You can start once they appear below.":"");GS.ignoreG=null;GS.G=null;GS.rc=code;monitor();
+function enterRoom(room,code,name,creator){GS.lastN=0;ROOM=room;GS.solo=!!room.stub;GS.connErr=null;GS.downSince=0;GS.joinedAt=Date.now();$("gRoomCode").textContent=code.toUpperCase();$("gShare").hidden=GS.solo;$("gShareMsg").textContent=GS.solo?"":(creator?"Send this code (or the invite link) to your friends. You can start once they appear below.":"");GS.ignoreG=null;GS.G=null;GS.rc=code;monitor();
   pres({n:name,t:ROOM.now?ROOM.now():Date.now(),st:"lobby",rc:code,h:creator?1:null});
-  UNSUB=ROOM.onPeers(onNet,function(e){GS.connErr=(e&&e.code)||"error";updConn()});
+  UNSUB=ROOM.onPeers(onNet,function(e){if(e&&e.code==="no_game"){leaveRoom();msg("This game is no longer available (it may have expired or the server restarted). Create a new game.");return}GS.connErr=(e&&e.code)||"error";updConn()});
   scr("lobby");onNet()}
-function newCode(){var a="abcdefghjkmnpqrstuvwxyz23456789",c="";for(var i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
-function doCreate(){doJoin(newCode(),true)}
-async function doJoin(code,creator){var name=cleanName($("gName").value);
-  if(typeof code!=="string")code=($("gCode").value||"").toLowerCase().replace(/[^a-z0-9_.-]/g,"").replace(/^[^a-z0-9]+/,"").slice(0,20);
+var CODE_OK=/^[a-hjkmnp-z2-9]{5}$/;
+function waking(){$("gMsg").className="fb";$("gMsg").textContent="Connecting… (the server may take up to a minute to wake up)"}
+async function doCreate(){SND.unlock();var name=cleanName($("gName").value);
+  if(!name){msg("Enter your name first.");$("gName").focus();return}
+  waking();var code=null;
+  try{var r=await fetch("/api/games",{method:"POST",cache:"no-store"});if(r.ok)code=(await r.json()).code}catch(e){}
+  if(!code){msg("Could not create a game. Wait a minute and try again, or play solo.");return}
+  doJoin(code,true)}
+async function doJoin(code,creator){SND.unlock();var name=cleanName($("gName").value);
+  if(typeof code!=="string")code=($("gCode").value||"").toLowerCase().replace(/[^a-z0-9]/g,"");
   if(!name){msg("Enter your name first.");$("gName").focus();return}
   if(!code){msg("Enter the game code your friend sent you.");$("gCode").focus();return}
+  if(!CODE_OK.test(code)){msg("That is not a valid game code. Codes have 5 letters and numbers, like K7MP2. Check it with your friend.");$("gCode").focus();return}
   try{localStorage.setItem("fq-name",name)}catch(e){}
-  $("gMsg").className="fb";$("gMsg").textContent="Connecting…";
+  waking();
+  // ask the server whether this game exists before joining
+  var st=0;try{st=(await fetch("/api/games/"+code,{cache:"no-store"})).status}catch(e){}
+  if(st===404){msg("No game found with code "+code.toUpperCase()+". Check the code with your friend, or create a new game.");$("gCode").focus();return}
+  if(st!==200){msg("Could not reach the game server. Wait a minute and try again, or play solo.");return}
   var room=null;try{room=(window.claude&&window.claude.use)?await window.claude.use("room"):null}catch(e){}
   if(!room){msg("Could not reach the game server. Wait a minute and try again, or play solo.");return}
   var nr=room;
@@ -659,28 +694,29 @@ function leaveRoom(){clearInterval(GS.mon);clearInterval(GS.tick);GS.tick=null;G
 function backToLobby(){clearInterval(GS.tick);GS.tick=null;GS.adv=false;GS.pending=null;
   pres({st:"lobby",g:null,cfg:null,a:0,s:0,c:0,ms:0});scr("lobby");onNet()}
 
-function renderLobby(ps){var box=$("gPlayers");box.innerHTML="";var h=hostOf(ps);$("gCount").textContent="Players ("+ps.length+")";
+function renderLobby(ps){if(GS.lastN&&ps.length>GS.lastN)SND.join();GS.lastN=ps.length;var box=$("gPlayers");box.innerHTML="";var h=hostOf(ps);$("gCount").textContent="Players ("+ps.length+")";
   ps.forEach(function(p){var s=document.createElement("span");if(p.sameTab)s.className="me";s.textContent=(h&&p.peer===h.peer?"★ ":"")+nm(p)+(p.sameTab?" (you)":"");box.appendChild(s)});
   var isHost=!!(h&&h.sameTab);$("gCfg").hidden=!isHost;
   $("gWait").hidden=isHost;if(!isHost&&h)$("gWait").textContent="You're in! Waiting for "+nm(h)+" (host) to start the quiz.";
   $("gSpec").hidden=!(h&&h.presence.st==="play"&&GS.ignoreG&&h.presence.g===GS.ignoreG)}
-function startGame(){var cfg={tn:$("cTn").value,set:$("cSet").value,kind:$("cKind").value,n:parseInt($("cN").value,10),seed:Math.floor(Math.random()*2147483647)};
+function startGame(){SND.unlock();var cfg={tn:$("cTn").value,set:$("cSet").value,kind:$("cKind").value,n:parseInt($("cN").value,10),qt:parseInt($("cQt").value,10),seed:Math.floor(Math.random()*2147483647)};
   var g="g"+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36);beginGame(g,cfg,true)}
-function beginGame(g,cfg,asHost){GS.G=g;GS.cfg=cfg;GS.n=cfg.n;GS.qs=buildQs(cfg);GS.i=-1;GS.score=0;GS.correct=0;GS.ms=0;GS.answered=false;GS.adv=false;GS.pending=null;
+function beginGame(g,cfg,asHost){GS.G=g;GS.cfg=cfg;GS.n=cfg.n;GS.qt=Math.min(60,Math.max(5,+cfg.qt||20))*1000;GS.endSnd=null;GS.lastTick=0;GS.qs=buildQs(cfg);GS.i=-1;GS.score=0;GS.correct=0;GS.ms=0;GS.answered=false;GS.adv=false;GS.pending=null;
   var patch={st:"play",g:g,a:0,s:0,c:0,ms:0};if(asHost)patch.cfg=cfg;pres(patch);
   scr("play");$("gScore").textContent="0";$("gProg").textContent="Get ready";$("gOpts").innerHTML="";$("gFb").textContent="";$("gFb").className="fb";
   $("gVerb").textContent="Get ready…";$("gEng").textContent="";$("gAsk").textContent="";$("gBarI").style.width="100%";
   clearInterval(GS.tick);GS.tick=setInterval(tickFn,200);countdown(3,g);onNet()}
-function countdown(n,g){if(GS.G!==g||GS.screen!=="play")return;if(n===0){showQ(0);return}$("gAsk").textContent="Starting in "+n;setTimeout(function(){countdown(n-1,g)},1000)}
+function countdown(n,g){if(GS.G!==g||GS.screen!=="play")return;if(n===0)SND.go();else SND.count();if(n===0){showQ(0);return}$("gAsk").textContent="Starting in "+n;setTimeout(function(){countdown(n-1,g)},1000)}
 
 /* ---------- questions ---------- */
-function showQ(i){GS.i=i;GS.answered=false;GS.picked=-1;GS.adv=false;GS.shownAt=Date.now();var q=GS.qs[i];
+function showQ(i){GS.lastTick=0;$("gTime").textContent=Math.round(GS.qt/1000)+"s";$("gTime").className="timer";$("gBar").className="bar";GS.i=i;GS.answered=false;GS.picked=-1;GS.adv=false;GS.shownAt=Date.now();var q=GS.qs[i];
   $("gProg").textContent="Question "+(i+1)+" of "+GS.n;$("gScore").textContent=GS.score;$("gBarI").style.width="100%";$("gFb").textContent="";$("gFb").className="fb";
   $("gVerb").textContent=q.verb;$("gEng").textContent=q.t==="form"?q.eng:"";
   $("gAsk").innerHTML="";if(q.t==="form"){$("gAsk").appendChild(document.createTextNode("Which form goes with "));var b=document.createElement("b");b.textContent=q.pron;$("gAsk").appendChild(b);$("gAsk").appendChild(document.createTextNode("?"))}else $("gAsk").textContent="What does it mean?";
   var m=$("gOpts");m.innerHTML="";q.opts.forEach(function(t,k){var bt=document.createElement("button");bt.textContent=t;bt.onclick=function(){submit(k)};m.appendChild(bt)})}
-function submit(k){if(GS.answered||GS.screen!=="play"||GS.i<0)return;GS.answered=true;GS.picked=k;var q=GS.qs[GS.i],ok=k===q.ans,t=Math.min(Date.now()-GS.shownAt,QT);
-  var pts=ok?10+Math.max(0,Math.round(5*(1-t/15000))):0;GS.score+=pts;if(ok)GS.correct++;GS.ms+=t;
+function submit(k){if(GS.answered||GS.screen!=="play"||GS.i<0)return;GS.answered=true;GS.picked=k;var q=GS.qs[GS.i],ok=k===q.ans,t=Math.min(Date.now()-GS.shownAt,GS.qt);
+  if(k<0)SND.timeup();else if(ok)SND.ok();else SND.bad();$("gBar").className="bar";$("gTime").className="timer";
+  var pts=ok?10+Math.max(0,Math.round(5*(1-t/(GS.qt*0.75)))):0;GS.score+=pts;if(ok)GS.correct++;GS.ms+=t;
   pres({a:GS.i+1,s:GS.score,c:GS.correct,ms:GS.ms});
   var bs=$("gOpts").children;for(var j=0;j<bs.length;j++){bs[j].disabled=true;if(j===q.ans)bs[j].className="ok";else if(j===k)bs[j].className="bad"}
   $("gScore").textContent=GS.score;var f=$("gFb");f.className="fb "+(ok?"ok":"bad");f.textContent=k<0?"Time is up. Answer: "+q.opts[q.ans]:(ok?"Correct, +"+pts:"Not quite. Answer: "+q.opts[q.ans]);
@@ -688,11 +724,15 @@ function submit(k){if(GS.answered||GS.screen!=="play"||GS.i<0)return;GS.answered
 function others(){return inGame().filter(function(p){return !p.sameTab&&p.presence.st==="play"})}
 function allAnswered(){return others().every(function(p){return(p.presence.a||0)>=GS.i+1})}
 function checkAdvance(){if(!GS.answered||GS.adv||GS.screen!=="play")return;
-  var all=allAnswered();if(all||Date.now()-GS.shownAt>=CAP){GS.adv=true;var i=GS.i,g=GS.G;setTimeout(function(){if(GS.G===g&&GS.i===i&&GS.screen==="play")goNext()},all?1500:0)}
+  var all=allAnswered();if(all||Date.now()-GS.shownAt>=GS.qt+8000){GS.adv=true;var i=GS.i,g=GS.G;setTimeout(function(){if(GS.G===g&&GS.i===i&&GS.screen==="play")goNext()},all?1500:0)}
   else{var w=others().filter(function(p){return(p.presence.a||0)<GS.i+1}).length;if(w&&!GS.adv)$("gFb").textContent=$("gFb").textContent.replace(/ • Waiting.*$/,"")+" • Waiting for "+w+" player"+(w>1?"s":"")}}
 function goNext(){if(GS.i+1>=GS.n)finish();else showQ(GS.i+1)}
 function tickFn(){if(GS.screen!=="play"||GS.i<0)return;var el=Date.now()-GS.shownAt;
-  if(!GS.answered){$("gBarI").style.width=Math.max(0,100*(1-el/QT))+"%";if(el>=QT)submit(-1)}else checkAdvance()}
+  if(!GS.answered){var left=Math.max(0,GS.qt-el),sec=Math.ceil(left/1000),urgent=sec<=5;
+    $("gBarI").style.width=(100*left/GS.qt)+"%";$("gTime").textContent=sec+"s";
+    $("gBar").className="bar"+(urgent?" urgent":"");$("gTime").className="timer"+(urgent?" urgent":"");
+    if(urgent&&sec>0&&GS.lastTick!==sec){GS.lastTick=sec;SND.tick()}
+    if(el>=GS.qt)submit(-1)}else checkAdvance()}
 function finish(){clearInterval(GS.tick);GS.tick=null;pres({st:"done",a:GS.n});scr("end");onNet()}
 
 /* ---------- network updates ---------- */
@@ -700,7 +740,8 @@ function renderEnd(){var ps=inGame();renderBoard($("gFinal"),ps);
   var done=ps.length>0&&ps.every(function(p){return p.presence.st==="done"});var w=$("gWin");
   if(!done){w.textContent="Final scores so far. Waiting for others to finish…"}
   else{var s=sorted(ps),top=s[0],tie=s.filter(function(p){return(p.presence.s||0)===(top.presence.s||0)&&(p.presence.ms||0)===(top.presence.ms||0)});
-    w.textContent=tie.length>1?"It is a tie: "+tie.map(nm).join(", "):(top.sameTab?"You win!":nm(top)+" wins!")}}
+    w.textContent=tie.length>1?"It is a tie: "+tie.map(nm).join(", "):(top.sameTab?"You win!":nm(top)+" wins!");
+    if(GS.endSnd!==GS.G){GS.endSnd=GS.G;var iWon=tie.some(function(p){return p.sameTab});if(iWon)SND.win();else SND.end()}}}
 function onNet(){if(!ROOM)return;var ps=players(),h=hostOf(ps);updConn();
   if(GS.screen==="lobby"){renderLobby(ps);
     if(h&&h.presence.st==="play"&&h.presence.g&&h.presence.g!==GS.G&&h.presence.g!==GS.ignoreG){
@@ -714,7 +755,7 @@ function onNet(){if(!ROOM)return;var ps=players(),h=hostOf(ps);updConn();
 /* ---------- wiring ---------- */
 function app(m){$("practice").hidden=(m!=="prac");$("play").hidden=(m!=="play");$("aPrac").className=(m==="prac"?"on":"");$("aPlay").className=(m==="play"?"on":"")}
 $("aPrac").onclick=function(){app("prac")};$("aPlay").onclick=function(){app("play")};
-$("gCreateBtn").onclick=doCreate;$("gCopyLink").onclick=copyLink;$("gJoinBtn").onclick=function(){doJoin()};$("gSoloBtn").onclick=doSolo;$("gStart").onclick=startGame;
+$("gCreateBtn").onclick=doCreate;[].forEach.call(document.querySelectorAll(".snd"),function(b){b.onclick=SND.toggle});SND.label();$("gCopyLink").onclick=copyLink;$("gJoinBtn").onclick=function(){doJoin()};$("gSoloBtn").onclick=doSolo;$("gStart").onclick=startGame;
 $("gLeave").onclick=leaveRoom;$("gLeave2").onclick=leaveRoom;$("gBack").onclick=backToLobby;
 $("gCode").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doJoin()}});
 try{var sv=localStorage.getItem("fq-name");if(sv)$("gName").value=sv}catch(e){}
