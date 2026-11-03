@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>French verbs quiz</title>
+<style>
+:root{--bg:#f3f6f4;--surface:#fff;--ink:#17231f;--muted:#5d6b66;--line:#cfd9d4;--accent:#1d4ed8;--ok:#0f7a4a;--bad:#b42318;--okbg:#e3f5ea;--badbg:#fde8e6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1815;--surface:#17231f;--ink:#e8f0ec;--muted:#9bada6;--line:#2b3b36;--accent:#7aa2ff;--ok:#5fd39b;--bad:#ff8a80;--okbg:#10301f;--badbg:#3a1714;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1815;--surface:#17231f;--ink:#e8f0ec;--muted:#9bada6;--line:#2b3b36;--accent:#7aa2ff;--ok:#5fd39b;--bad:#ff8a80;--okbg:#10301f;--badbg:#3a1714;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,"Times New Roman",serif;line-height:1.55;font-size:17px}
+main{max-width:560px;margin:0 auto;padding:20px 16px 48px}
+main.wide{max-width:980px}
+#rt th,#rt td{white-space:nowrap}
+@media(max-width:600px){#ref{padding:10px 6px}#rt{font-size:.7rem}#rt th,#rt td{padding:5px 3px}#rt small{font-size:.62rem;white-space:normal}}
+h1{font-size:1.6rem;margin:4px 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{flex:1 1 30%;padding:9px 6px;font-size:.92rem}
+.tabs.tense button{font-weight:600;padding:11px 6px}
+button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 12px;border-radius:8px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.stats{display:flex;gap:16px;color:var(--muted);font-size:.9rem;margin-bottom:12px;flex-wrap:wrap}
+.stats b{color:var(--ink)}
+.verb{font-size:2.3rem;font-weight:700;margin:0;line-height:1.1}
+.eng{color:var(--muted);margin:2px 0 14px;font-style:italic}
+.q{font-size:1.25rem;margin:0 0 10px}
+.q b{color:var(--accent)}
+input[type=text]{width:100%;font:inherit;font-size:1.2rem;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input.ok{border-color:var(--ok);background:var(--okbg)}
+input.bad{border-color:var(--bad);background:var(--badbg)}
+.row{display:flex;gap:8px;margin-top:10px}
+.row button{flex:1}
+.fb{min-height:1.6em;margin-top:10px;font-weight:600}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.grid{display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center}
+.grid label{text-align:right;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{padding:6px 10px;font-size:.9rem}
+.chips button.on{background:var(--accent);color:#fff}
+.opts{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.wrap{overflow-x:auto}
+.hint{color:var(--muted);font-size:.85rem;margin:8px 0 12px}
+.mc{display:grid;gap:8px;margin-top:6px}
+.mc button{text-align:left}
+.mc button.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.mc button.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.verb.sm{font-size:1.6rem}
+[hidden]{display:none!important}
+.gh{background:var(--bg);font-weight:700;color:var(--accent)}
+#map h3{margin:18px 0 4px;font-size:1.05rem}
+#map h3:first-child{margin-top:0}
+#map .tip{color:var(--muted);font-size:.85rem;margin:0 0 6px}
+#map td.pp{font-weight:700;color:var(--accent)}
+#map td.en{color:var(--muted);font-style:italic}
+mark{background:#ffe066;color:#17231f;padding:0 2px;border-radius:3px}
+select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.fld{display:grid;gap:4px;margin-bottom:10px}
+.fld label{color:var(--muted);font-size:.9rem}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 14px}
+.bar i{display:block;height:100%;width:100%;background:var(--accent)}
+.pl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pl span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.92rem}
+.pl span.me{border-color:var(--accent)}
+.rank td,.rank th{white-space:nowrap}
+.rank tr.me td{font-weight:700}
+.banner{background:var(--okbg);border:1px solid var(--ok);color:var(--ok);padding:8px 12px;border-radius:8px;margin:8px 0;font-size:.92rem}
+.banner button{margin-left:8px}
+textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
+.banner.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+</style>
+</head>
+<body>
+<main>
+<h1>French verbs</h1>
+<p class="sub">Pick a tense, then practise. Accents are optional by default.</p>
+
+<div class="tabs" id="apps"><button id="aPrac" class="on">Practice</button><button id="aPlay">Play with friends</button></div>
+<div id="practice">
+<div class="tabs tense" id="tenses">
+  <button id="nPres" class="on" onclick="setTense('pres')">Present</button>
+  <button id="nPast" onclick="setTense('past')">Past</button>
+  <button id="nFut" onclick="setTense('fut')">Future</button>
+</div>
+<div class="tabs" id="sets"><button id="sIrr" class="on" onclick="setSet('irr')">Irregular</button><button id="sReg" onclick="setSet('reg')">Regular</button><button id="sAll" onclick="setSet('all')">Combined</button></div>
+<p class="hint" id="thint"></p>
+
+<div class="tabs" role="tablist" id="modes">
+  <button id="tQuick" class="on" onclick="setMode('quick')">One form</button>
+  <button id="tTable" onclick="setMode('table')">Full table</button>
+  <button id="tFr2en" onclick="setMode('fr2en')">French → English</button>
+  <button id="tEn2fr" onclick="setMode('en2fr')">English → French</button>
+  <button id="tRef" onclick="setMode('ref')">Cheat sheet</button>
+  <button id="tMap" onclick="setMode('map')" hidden>Memory map</button>
+</div>
+<div class="tabs" id="psub" hidden>
+  <button id="uF" class="on" onclick="setSub('form')">Full form</button>
+  <button id="uA" onclick="setSub('aux')">Auxiliary</button>
+  <button id="uP" onclick="setSub('part')">Participle</button>
+</div>
+
+<div id="filters" class="card">
+  <div>Verbs to practise</div>
+  <div class="chips" id="chips"></div>
+  <div class="chips" id="grp"></div>
+  <label class="opts"><input type="checkbox" id="lenient" checked> Ignore accents</label>
+</div>
+
+<section id="quick" class="card">
+  <div class="stats"><span>Score <b id="sc">0</b>/<b id="tot">0</b></span><span>Streak <b id="st">0</b></span><span>Best <b id="bs">0</b></span></div>
+  <p class="verb" id="qv"></p>
+  <p class="eng" id="qe"></p>
+  <p class="q" id="qp"></p>
+  <input type="text" id="ans" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Your answer">
+  <div class="fb" id="fb" aria-live="polite"></div>
+  <div class="row"><button class="primary" id="check" onclick="checkQuick()">Check</button><button onclick="skipQuick()">Skip</button></div>
+  <p class="hint">Press Enter to check, then Enter again for the next one.</p>
+</section>
+
+<section id="table" class="card" hidden>
+  <p class="verb" id="tv"></p>
+  <p class="eng" id="te"></p>
+  <div class="grid" id="tg"></div>
+  <div class="fb" id="tfb" aria-live="polite"></div>
+  <div class="row"><button class="primary" onclick="checkTable()">Check all</button><button onclick="nextTable()">Next verb</button></div>
+</section>
+
+<section id="fr2en" class="card" hidden>
+  <div class="stats"><span>Score <b id="fs">0</b>/<b id="ft">0</b></span><span>Streak <b id="fk">0</b></span></div>
+  <p class="q">What does this verb mean?</p>
+  <p class="verb" id="fv"></p>
+  <div class="mc" id="fo"></div>
+  <div class="fb" id="ffb" aria-live="polite"></div>
+  <div class="row"><button class="primary" onclick="newF()">Next</button></div>
+</section>
+
+<section id="en2fr" class="card" hidden>
+  <div class="stats"><span>Score <b id="es">0</b>/<b id="et">0</b></span><span>Streak <b id="ek">0</b></span></div>
+  <p class="q">Type the French verb (infinitive):</p>
+  <p class="verb sm" id="ev"></p>
+  <input type="text" id="ea" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="French verb">
+  <div class="fb" id="efb" aria-live="polite"></div>
+  <div class="row"><button class="primary" id="ec" onclick="checkE()">Check</button><button onclick="skipE()">Skip</button></div>
+</section>
+
+<section id="pc" class="card" hidden>
+  <div class="stats"><span>Score <b id="ps">0</b>/<b id="pt">0</b></span><span>Streak <b id="pk">0</b></span></div>
+  <p class="q" id="pq"></p>
+  <p class="verb sm" id="pv"></p>
+  <p class="eng" id="pe"></p>
+  <div class="mc" id="pm"></div>
+  <input type="text" id="pa" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Your answer">
+  <div class="fb" id="pfb" aria-live="polite"></div>
+  <div class="row"><button class="primary" id="pcb" onclick="pcCheck()">Check</button><button id="pskip" onclick="pcSkip()">Skip</button></div>
+</section>
+
+<section id="map" class="card" hidden></section>
+
+<section id="ref" class="card" hidden>
+  <p class="hint" id="rpre"></p>
+  <div class="wrap"><table id="rt"></table></div>
+  <p class="hint" id="rules"></p>
+</section>
+</div>
+
+<section id="play" hidden>
+  <div id="gJoin" class="card">
+    <p class="q">Play with friends</p>
+    <p class="hint">Everyone types a name and the same room code. The first person in the room is the host and starts the quiz for everyone. The highest score wins.</p>
+    <div class="fld"><label for="gName">Your name</label><input type="text" id="gName" maxlength="16" autocomplete="off"></div>
+    <div class="fld"><label for="gCode">Room code</label><input type="text" id="gCode" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Any word, for example paris7"></div>
+    <div class="row"><button class="primary" id="gJoinBtn">Join room</button><button id="gSoloBtn">Play solo</button></div>
+    <div class="fb" id="gMsg" aria-live="polite"></div>
+    <p class="hint">Share this page link and the same room code with your friends. No sign-in needed. The first visit after a quiet period can take up to a minute to connect.</p>
+    <hr class="sep">
+    <p class="q">Challenge (no sign-in needed)</p>
+    <p class="hint">One person creates a code. Everyone enters it to get the same questions on their own screen, then you compare scores.</p>
+    <div class="fld"><label for="chTn">Tense</label><select id="chTn"><option value="pres">Present</option><option value="past">Past (passé composé)</option><option value="fut">Future</option></select></div>
+    <div class="fld"><label for="chSet">Verbs</label><select id="chSet"><option value="all">Regular and irregular</option><option value="irr">Irregular only</option><option value="reg">Regular only</option></select></div>
+    <div class="fld"><label for="chKind">Questions</label><select id="chKind"><option value="mix">Mixed</option><option value="form">Conjugation</option><option value="mean">Meaning</option></select></div>
+    <div class="fld"><label for="chN">Number of questions</label><select id="chN"><option>10</option><option>15</option><option>20</option></select></div>
+    <div class="row"><button id="chCreate">Create challenge code</button></div>
+    <div class="fld" style="margin-top:12px"><label for="chCode">Challenge code</label><input type="text" id="chCode" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Create one, or paste your friend's code"></div>
+    <div class="row"><button class="primary" id="chStart">Start challenge</button></div>
+    <div class="fb" id="chMsg" aria-live="polite"></div>
+  </div>
+
+  <div id="gLobby" class="card" hidden>
+    <p class="q">Room <b id="gRoomCode"></b></p>
+    <div class="pl" id="gPlayers"></div>
+    <div class="banner bad" id="gConn" hidden></div>
+    <p class="hint" id="gDiag"></p>
+    <div class="banner" id="gSpec" hidden>A game is in progress. You will join the next one.</div>
+    <div id="gCfg" hidden>
+      <div class="fld"><label for="cTn">Tense</label><select id="cTn"><option value="pres">Present</option><option value="past">Past (passé composé)</option><option value="fut">Future</option></select></div>
+      <div class="fld"><label for="cSet">Verbs</label><select id="cSet"><option value="all">Regular and irregular</option><option value="irr">Irregular only</option><option value="reg">Regular only</option></select></div>
+      <div class="fld"><label for="cKind">Questions</label><select id="cKind"><option value="mix">Mixed</option><option value="form">Conjugation</option><option value="mean">Meaning</option></select></div>
+      <div class="fld"><label for="cN">Number of questions</label><select id="cN"><option>10</option><option>15</option><option>20</option></select></div>
+      <div class="row"><button class="primary" id="gStart">Start game for everyone</button></div>
+    </div>
+    <p class="hint" id="gWait" hidden></p>
+    <div class="row"><button id="gLeave">Leave room</button></div>
+  </div>
+
+  <div id="gQ" class="card" hidden>
+    <div class="stats"><span id="gProg"></span><span>Score <b id="gScore">0</b></span></div>
+    <div class="bar"><i id="gBarI"></i></div>
+    <p class="verb sm" id="gVerb"></p>
+    <p class="eng" id="gEng"></p>
+    <p class="q" id="gAsk"></p>
+    <div class="mc" id="gOpts"></div>
+    <div class="fb" id="gFb" aria-live="polite"></div>
+    <div class="wrap"><table class="rank" id="gBoard"></table></div>
+  </div>
+
+  <div id="gEnd" class="card" hidden>
+    <p class="q" id="gWin"></p>
+    <div class="wrap"><table class="rank" id="gFinal"></table></div>
+    <div id="gChal" hidden>
+      <p class="hint">Send your result line to friends, and paste theirs below to compare.</p>
+      <div class="fld"><label for="chMine">Your result</label><input type="text" id="chMine" readonly></div>
+      <div class="row"><button id="chCopy">Copy my result</button></div>
+      <div class="fld" style="margin-top:12px"><label for="chPaste">Friends' results (one per line)</label><textarea id="chPaste" rows="3" spellcheck="false"></textarea></div>
+      <div class="row"><button class="primary" id="chAdd">Add to comparison</button></div>
+      <div class="fb" id="chAddMsg" aria-live="polite"></div>
+      <div class="wrap"><table class="rank" id="chTable"></table></div>
+    </div>
+    <div class="banner" id="gNew" hidden><span>The host started a new game.</span><button class="primary" id="gNewBtn">Join new game</button></div>
+    <div class="row"><button class="primary" id="gBack">Back to lobby</button><button id="gLeave2">Leave room</button></div>
+  </div>
+</section>
+</main>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var P=["je","tu","il/elle","nous","vous","ils/elles"];
+var V=[
+["Être","to be",["suis","es","est","sommes","êtes","sont"],"special"],
+["Avoir","to have",["ai","as","a","avons","avez","ont"],"special"],
+["Aller","to go",["vais","vas","va","allons","allez","vont"],"special"],
+["Faire","to do / to make",["fais","fais","fait","faisons","faites","font"],"special"],
+["Venir","to come",["viens","viens","vient","venons","venez","viennent"],"family"],
+["Tenir","to hold",["tiens","tiens","tient","tenons","tenez","tiennent"],"family"],
+["Prendre","to take",["prends","prends","prend","prenons","prenez","prennent"],"family"],
+["Apprendre","to learn",["apprends","apprends","apprend","apprenons","apprenez","apprennent"],"family"],
+["Lire","to read",["lis","lis","lit","lisons","lisez","lisent"],"family"],
+["Dire","to say / to tell",["dis","dis","dit","disons","dites","disent"],"family"],
+["Voir","to see",["vois","vois","voit","voyons","voyez","voient"],"family"],
+["Devoir","must / to have to / to owe",["dois","dois","doit","devons","devez","doivent"],"family"],
+["Savoir","to know (a fact, how to)",["sais","sais","sait","savons","savez","savent"],"family"],
+["Croire","to believe",["crois","crois","croit","croyons","croyez","croient"],"family"],
+["Ouvrir","to open",["ouvre","ouvres","ouvre","ouvrons","ouvrez","ouvrent"],"family"],
+["Offrir","to offer / to give",["offre","offres","offre","offrons","offrez","offrent"],"family"],
+["Couvrir","to cover",["couvre","couvres","couvre","couvrons","couvrez","couvrent"],"family"],
+["Dormir","to sleep",["dors","dors","dort","dormons","dormez","dorment"],"ir"],
+["Partir","to leave / to depart",["pars","pars","part","partons","partez","partent"],"ir"],
+["Sortir","to go out / to exit",["sors","sors","sort","sortons","sortez","sortent"],"ir"],
+["Servir","to serve",["sers","sers","sert","servons","servez","servent"],"ir"],
+["Sentir","to feel / to smell",["sens","sens","sent","sentons","sentez","sentent"],"ir"],
+["Pouvoir","can / to be able to",["peux","peux","peut","pouvons","pouvez","peuvent"],"ir"],
+["Vouloir","to want",["veux","veux","veut","voulons","voulez","veulent"],"ir"],
+["Écrire","to write",["écris","écris","écrit","écrivons","écrivez","écrivent"],"re"],
+["Conduire","to drive / to lead",["conduis","conduis","conduit","conduisons","conduisez","conduisent"],"re"],
+["Boire","to drink",["bois","bois","boit","buvons","buvez","boivent"],"re"],
+["Mettre","to put / to place",["mets","mets","met","mettons","mettez","mettent"],"re"],
+["Atteindre","to reach / to attain",["atteins","atteins","atteint","atteignons","atteignez","atteignent"],"re"],
+["Connaître","to know (a person or place)",["connais","connais","connaît","connaissons","connaissez","connaissent"],"re"],
+["Courir","to run",["cours","cours","court","courons","courez","courent"],"extra"],
+["Recevoir","to receive",["reçois","reçois","reçoit","recevons","recevez","reçoivent"],"extra"],
+["Parler","to speak / to talk",["parle","parles","parle","parlons","parlez","parlent"],"er"],
+["Aimer","to like / to love",["aime","aimes","aime","aimons","aimez","aiment"],"er"],
+["Habiter","to live (reside)",["habite","habites","habite","habitons","habitez","habitent"],"er"],
+["Travailler","to work",["travaille","travailles","travaille","travaillons","travaillez","travaillent"],"er"],
+["Regarder","to watch / to look at",["regarde","regardes","regarde","regardons","regardez","regardent"],"er"],
+["Écouter","to listen",["écoute","écoutes","écoute","écoutons","écoutez","écoutent"],"er"],
+["Chercher","to look for",["cherche","cherches","cherche","cherchons","cherchez","cherchent"],"er"],
+["Danser","to dance",["danse","danses","danse","dansons","dansez","dansent"],"er"],
+["Finir","to finish",["finis","finis","finit","finissons","finissez","finissent"],"ir2"],
+["Choisir","to choose",["choisis","choisis","choisit","choisissons","choisissez","choisissent"],"ir2"],
+["Réussir","to succeed / to pass",["réussis","réussis","réussit","réussissons","réussissez","réussissent"],"ir2"],
+["Grandir","to grow",["grandis","grandis","grandit","grandissons","grandissez","grandissent"],"ir2"],
+["Remplir","to fill",["remplis","remplis","remplit","remplissons","remplissez","remplissent"],"ir2"],
+["Attendre","to wait",["attends","attends","attend","attendons","attendez","attendent"],"re2"],
+["Vendre","to sell",["vends","vends","vend","vendons","vendez","vendent"],"re2"],
+["Répondre","to answer",["réponds","réponds","répond","répondons","répondez","répondent"],"re2"],
+["Entendre","to hear",["entends","entends","entend","entendons","entendez","entendent"],"re2"],
+["Perdre","to lose",["perds","perds","perd","perdons","perdez","perdent"],"re2"],
+["Manger","to eat",["mange","manges","mange","mangeons","mangez","mangent"],"ger"],
+["Voyager","to travel",["voyage","voyages","voyage","voyageons","voyagez","voyagent"],"ger"],
+["Partager","to share",["partage","partages","partage","partageons","partagez","partagent"],"ger"],
+["Changer","to change",["change","changes","change","changeons","changez","changent"],"ger"],
+["Commencer","to start / to begin",["commence","commences","commence","commençons","commencez","commencent"],"cer"],
+["Lancer","to throw / to launch",["lance","lances","lance","lançons","lancez","lancent"],"cer"],
+["Prononcer","to pronounce",["prononce","prononces","prononce","prononçons","prononcez","prononcent"],"cer"],
+["Avancer","to advance / to move forward",["avance","avances","avance","avançons","avancez","avancent"],"cer"],
+["Envoyer","to send",["envoie","envoies","envoie","envoyons","envoyez","envoient"],"yer"],
+["Nettoyer","to clean",["nettoie","nettoies","nettoie","nettoyons","nettoyez","nettoient"],"yer"],
+["Essayer","to try",["essaie/essaye","essaies/essayes","essaie/essaye","essayons","essayez","essaient/essayent"],"yer"],
+["Employer","to use / to employ",["emploie","emploies","emploie","employons","employez","emploient"],"yer"],
+["Payer","to pay",["paie/paye","paies/payes","paie/paye","payons","payez","paient/payent"],"yer"]
+];
+
+/* ---------- Past (passé composé) data ---------- */
+var PP={"Être":"été","Avoir":"eu","Faire":"fait","Devoir":"dû","Savoir":"su","Connaître":"connu","Dire":"dit","Boire":"bu","Couvrir":"couvert","Courir":"couru","Écrire":"écrit","Mettre":"mis","Prendre":"pris","Apprendre":"appris","Tenir":"tenu","Venir":"venu","Voir":"vu","Pouvoir":"pu","Vouloir":"voulu","Atteindre":"atteint","Lire":"lu","Croire":"cru","Conduire":"conduit","Recevoir":"reçu","Ouvrir":"ouvert","Offrir":"offert"};
+function pp(n){if(PP[n])return PP[n];var l=n.toLowerCase();if(/er$/.test(l))return l.slice(0,-2)+"é";if(/ir$/.test(l))return l.slice(0,-1);if(/re$/.test(l))return l.slice(0,-2)+"u";return l}
+var ETRE=["Aller","Venir","Partir","Sortir"];
+var EX=[["Devenir","to become","devenu"],["Revenir","to come back","revenu"],["Monter","to climb","monté"],["Rester","to stay","resté"],["Naître","to be born","né"],["Descendre","to go down","descendu"],["Entrer","to enter","entré"],["Rentrer","to re-enter","rentré"],["Tomber","to fall","tombé"],["Retourner","to turn around","retourné"],["Arriver","to arrive","arrivé"],["Mourir","to die","mort"]];
+var EX2=[["Abstenir","to abstain","abstenu"],["Acquérir","to acquire","acquis"],["Asseoir","to sit","assis"],["Comprendre","to understand","compris"],["Construire","to build","construit"],["Craindre","to fear","craint"],["Décevoir","to disappoint","déçu"],["Découvrir","to discover","découvert"],["Falloir","to be necessary","fallu",1],["Instruire","to instruct","instruit"],["Joindre","to join","joint"],["Obtenir","to obtain","obtenu"],["Peindre","to paint","peint"],["Permettre","to allow / to permit","permis"],["Plaire","to please","plu"],["Pleuvoir","to rain","plu",1],["Produire","to produce","produit"],["Réduire","to reduce","réduit"],["Rire","to laugh","ri"],["Souffrir","to suffer","souffert"],["Suivre","to follow","suivi"],["Vivre","to live","vécu"],["Valoir","to be worth","valu"]];
+var IRRN=["Abstenir","Acquérir","Apprendre","Atteindre","Asseoir","Avoir","Boire","Comprendre","Conduire","Connaître","Construire","Courir","Couvrir","Craindre","Croire","Décevoir","Découvrir","Devoir","Dire","Écrire","Être","Faire","Falloir","Instruire","Joindre","Lire","Mettre","Mourir","Naître","Obtenir","Offrir","Ouvrir","Peindre","Permettre","Plaire","Pleuvoir","Prendre","Produire","Pouvoir","Recevoir","Réduire","Rire","Savoir","Souffrir","Suivre","Tenir","Vivre","Valoir","Voir","Vouloir"];
+var AUXF={"avoir":["ai","as","a","avons","avez","ont"],"être":["suis","es","est","sommes","êtes","sont"]};
+var SFP=[["","e"],["","e"],["","e"],["s","es"],["","e","s","es"],["s","es"]];
+function pastForms(aux,p){var out=[];for(var k=0;k<6;k++){var a=AUXF[aux][k],sf=aux==="être"?SFP[k]:[""];out.push(sf.map(function(s){return a+" "+p+s}).join("/"))}return out}
+var PL=V.map(function(v){return{n:v[0],e:v[1],p:pp(v[0]),a:ETRE.indexOf(v[0])>-1?"être":"avoir"}})
+  .concat(EX.map(function(x){return{n:x[0],e:x[1],p:x[2],a:"être"}}))
+  .concat(EX2.map(function(x){return{n:x[0],e:x[1],p:x[2],a:"avoir",imp:!!x[3]}}));
+var PAST=PL.map(function(x){return[x.n,x.e,pastForms(x.a,x.p),x.a==="être"?"etre":"avoir",!!x.imp,x.p,x.a]});
+
+/* ---------- Future simple data ---------- */
+var STEM={"Avoir":"aur","Être":"ser","Aller":"ir","Faire":"fer","Pouvoir":"pourr","Vouloir":"voudr","Devoir":"devr","Savoir":"saur","Venir":"viendr","Tenir":"tiendr","Voir":"verr","Envoyer":"enverr","Courir":"courr","Mourir":"mourr","Recevoir":"recevr","Valoir":"vaudr","Pleuvoir":"pleuvr","Falloir":"faudr"};
+var FE=["ai","as","a","ons","ez","ont"];
+function futStems(n){var l=n.toLowerCase();if(STEM[n])return[STEM[n]];
+  if(/yer$/.test(l)){var s=[l.slice(0,-3)+"ier"];if(n==="Essayer"||n==="Payer")s.push(l);return s}
+  if(/re$/.test(l))return[l.slice(0,-1)];return[l]}
+function futGrp(n){var l=n.toLowerCase();if(STEM[n])return"fstem";if(/yer$/.test(l))return"fyer";if(/er$/.test(l))return"fer";if(/ir$/.test(l))return"fir";return"fre"}
+function futRow(n,e,imp){return[n,e,FE.map(function(en){return futStems(n).map(function(s){return s+en}).join("/")}),futGrp(n),!!imp]}
+var FUT=V.map(function(v){return futRow(v[0],v[1])}).concat([futRow("Mourir","to die"),futRow("Valoir","to be worth"),futRow("Pleuvoir","to rain",1),futRow("Falloir","to be necessary",1)]);
+
+/* ---------- Shared state ---------- */
+var D={pres:V,past:PAST,fut:FUT};
+var SEL={};["pres","past","fut"].forEach(function(t){SEL[t]=D[t].map(function(){return true})});
+var TN="pres",MODE="quick",SUB="form",set="irr";
+var REG=["er","ir2","re2","ger","cer","yer"];
+var GL={special:"Special",family:"Twin / family",ir:"IR family",re:"RE family",extra:"Extra",er:"Regular -er",ir2:"Regular -ir (finir type)",re2:"Regular -re",ger:"-ger verbs (nous: -geons)",cer:"-cer verbs (nous: -çons)",yer:"-yer verbs (y → i, except nous/vous)",
+  etre:"Auxiliary être (16 verbs)",avoir:"Auxiliary avoir",
+  fstem:"Irregular stems + ai, as, a, ons, ez, ont",fer:"-er verbs: infinitive + endings",fir:"-ir verbs: infinitive + endings",fre:"-re verbs: drop the e, add endings",fyer:"-yer verbs: y → i in every form"};
+var GRT={
+ pres:{irr:[["special","Special 4"],["family","Twin/family 13"],["ir","IR 7"],["re","RE 6"],["extra","Extra 2"]],reg:[["er","-er"],["ir2","-ir"],["re2","-re"],["ger","-ger"],["cer","-cer"],["yer","-yer"]]},
+ fut:{irr:[["fstem","Irregular stems"]],reg:[["fer","-er"],["fir","-ir"],["fre","-re"],["fyer","-yer"]]},
+ past:{irr:[["etre","être verbs"],["avoir","avoir verbs"]],reg:[["etre","être verbs"],["avoir","avoir verbs"]]}};
+var HINTS={
+ pres:"Present: type the conjugated form without the pronoun.",
+ past:"Past (passé composé) = avoir/être + past participle. Type the form without the pronoun, e.g. ai mangé. Either gender is accepted for être verbs.",
+ fut:"Future: stem + ai, as, a, ons, ez, ont. Type the form without the pronoun, e.g. parlerai."};
+var PRES_RULES="<b>Regular endings</b><br>-er: e, es, e, ons, ez, ent<br>-ir (finir): is, is, it, issons, issez, issent<br>-re: s, s, (none), ons, ez, ent<br>-ger: keep the e before -ons (mangeons)<br>-cer: c becomes ç before -ons (commençons)<br>-yer: y becomes i before silent endings (paie, paies, paie, paient); nous/vous keep y. Both spellings are accepted for payer and essayer.";
+var PAST_RULES="<b>Passé composé</b> = avoir/être (present) + past participle.<br>être verbs (16): Devenir, Revenir, Monter, Rester, Sortir, Venir, Aller, Naître, Descendre, Entrer, Rentrer, Tomber, Retourner, Arriver, Mourir, Partir (DR MRS VANDERTRAMP), plus reflexive verbs.<br>Regular participles: -er → é, -ir → i, -re → u.<br>Agreement with être: je/tu +e (fem.), elle +e, nous/vous +s or es, ils +s, elles +es.<br>Falloir and pleuvoir are impersonal (il a fallu, il a plu).";
+var FUT_RULES="<b>Future simple</b> = stem + ai, as, a, ons, ez, ont.<br>-er and -ir verbs: infinitive + endings (parlerai, finirai).<br>-re verbs: drop the final e (vendrai).<br>-yer verbs: y becomes i (nettoierai); essayer and payer accept both spellings.<br>Irregular stems: aur-, ser-, ir-, fer-, pourr-, voudr-, devr-, saur-, viendr-, tiendr-, verr-, enverr-, courr-, mourr-, recevr-.";
+FUT_RULES="<b>Future simple rules</b><br>1. Know the meaning of the verb.<br>2. If the verb is in the irregular stems list above, take its stem and add the avoir endings: ai, as, a, ons, ez, ont.<br>3. Otherwise it is regular: -er and -ir verbs keep the whole infinitive and add the endings (parlerai, finirai). -re verbs drop the final e first (vendrai).<br>4. -yer verbs change y to i in every form (nettoierai); essayer and payer accept both spellings.<br><br><b>Irregular stems, in your memory order</b><br>être ser- | avoir aur- | aller ir- | faire fer-<br>voir verr- | devoir devr- | savoir saur- | pouvoir pourr- | vouloir voudr-<br>venir viendr- | tenir tiendr-<br>envoyer enverr- | mourir mourr- | courir courr-<br>valoir vaudr- | pleuvoir pleuvr- | falloir faudr- (pleuvoir and falloir are impersonal: il pleuvra, il faudra)";
+var FUT_REG="<b>Step 1: Regular verbs (use this first)</b><br>-er and -ir: keep the whole infinitive and add ai, as, a, ons, ez, ont (parlerai, finirai).<br>-re: drop the final e, then add the endings (vendrai).<br>-yer: y becomes i in every form (nettoierai); essayer and payer accept both spellings.";
+var FUT_IRR="<b>Step 2: Irregular verbs</b><br>If the verb is in the list above, take its stem and add the same endings: ai, as, a, ons, ez, ont.<br><br><b>Stems, in your memory order</b><br>être ser- | avoir aur- | aller ir- | faire fer-<br>voir verr- | devoir devr- | savoir saur- | pouvoir pourr- | vouloir voudr-<br>venir viendr- | tenir tiendr-<br>envoyer enverr- | mourir mourr- | courir courr-<br>valoir vaudr- | pleuvoir pleuvr- | falloir faudr- (pleuvoir and falloir are impersonal: il pleuvra, il faudra)";
+function rulesText(){if(TN==="pres")return set==="irr"?"":PRES_RULES;return TN==="past"?PAST_RULES:FUT_RULES}
+
+function DS(){return D[TN]}
+function S(){return SEL[TN]}
+function groups(t,s){var g=GRT[t];if(s==="all")return t==="past"?g.irr:g.reg.concat(g.irr);return g[s]}
+function isReg(i){var d=DS()[i];if(TN==="pres")return REG.indexOf(d[3])>-1;if(TN==="fut")return d[3]!=="fstem";return IRRN.indexOf(d[0])<0}
+function visible(i){return set==="all"||(set==="reg")===isReg(i)}
+function norm(s){s=s.trim().toLowerCase().replace(/[’']/g,"'").replace(/\s+/g," ");
+  if($("lenient").checked)s=s.normalize("NFD").replace(/[̀-ͯ]/g,"");return s}
+function match(inp,right){return right.split("/").some(function(r){return norm(r)===norm(inp)})}
+function pron(i,f,imp){if(i===0&&/^[aeiouhéÉ]/i.test(f.split("/")[0]))return"j’";return(imp?"il":P[i])+" "}
+function showAns(i,f,imp){var pr=pron(i,f,imp);return f.split("/").map(function(a){return pr+a}).join(" / ")}
+function pool(){var p=[];DS().forEach(function(d,i){if(S()[i]&&visible(i))p.push(i)});return p}
+var DECKS={},WRAP=false;
+function build(p,pairs){var a=[];p.forEach(function(vi){if(pairs&&!DS()[vi][4]){for(var k=0;k<6;k++)a.push({v:vi,p:k})}else a.push({v:vi,p:2})});return shuffle(a)}
+function draw(key,pairs){var p=pool();WRAP=false;if(!p.length)return null;
+  var sg=TN+"|"+set+"|"+p.join(",")+"|"+(pairs?1:0),d=DECKS[key];
+  if(!d||d.sg!==sg){d=DECKS[key]={sg:sg,q:build(p,pairs),last:null}}
+  else if(!d.q.length){d.q=build(p,pairs);var n=d.q.length;WRAP=n>1;
+    if(n>1&&d.last&&d.q[n-1].v===d.last.v&&d.q[n-1].p===d.last.p){var t=d.q[n-1];d.q[n-1]=d.q[0];d.q[0]=t}}
+  var o=d.q.pop();d.last=o;return o}
+function pick(key){var o=draw(key||"x",false);return o===null?null:o.v}
+function roundMsg(el,txt){var e=$(el);e.className="fb ok";e.textContent=txt}
+
+/* ---------- Filters ---------- */
+function renderGroups(){var g=$("grp");g.innerHTML="";
+  var add=function(t,f){var b=document.createElement("button");b.textContent=t;b.onclick=f;g.appendChild(b)};
+  add("All",function(){selAll(true)});add("None",function(){selAll(false)});
+  groups(TN,set).forEach(function(x){add(x[1],function(){selGroup(x[0])})})}
+function renderChips(){var c=$("chips");c.innerHTML="";
+  DS().forEach(function(d,i){if(!visible(i))return;var b=document.createElement("button");b.textContent=d[0];
+    if(S()[i])b.className="on";b.setAttribute("aria-pressed",S()[i]);
+    b.onclick=function(){S()[i]=!S()[i];renderChips();restart()};c.appendChild(b)})}
+function selAll(x){var old=S();SEL[TN]=DS().map(function(d,i){return visible(i)?x:old[i]});renderChips();restart()}
+function selGroup(g){var old=S();SEL[TN]=DS().map(function(d,i){return visible(i)?d[3]===g:old[i]});renderChips();restart()}
+function restart(){newQuick();newTable();newF();newE();pcNew()}
+
+/* ---------- Navigation ---------- */
+function view(){if(MODE==="map"&&TN!=="past")MODE="quick";if(MODE==="ref"&&TN==="past")MODE="map";$("tRef").hidden=(TN==="past");var sec=MODE;if(MODE==="quick"&&TN==="past"&&SUB!=="form")sec="pc";
+  ["quick","table","fr2en","en2fr","pc","ref","map"].forEach(function(k){$(k).hidden=(k!==sec)});
+  ["quick","table","fr2en","en2fr","ref","map"].forEach(function(k){$("t"+k[0].toUpperCase()+k.slice(1)).className=(k===MODE?"on":"")});
+  $("tMap").hidden=(TN!=="past");
+  $("filters").hidden=(MODE==="ref"||MODE==="map");$("psub").hidden=!(TN==="past"&&MODE==="quick");
+  document.querySelector("main").className=(MODE==="ref"?"wide":"")}
+function setMode(m){MODE=m;view()}
+function setSub(s){SUB=s;var ids={form:"uF",aux:"uA",part:"uP"};Object.keys(ids).forEach(function(k){$(ids[k]).className=(k===s?"on":"")});view();pcNew()}
+function setSet(s){set=s;["Irr","Reg","All"].forEach(function(k){$("s"+k).className=(k.toLowerCase()===s?"on":"")});renderGroups();renderChips();renderRef();restart()}
+function setTense(t){TN=t;["Pres","Past","Fut"].forEach(function(k){$("n"+k).className=(k.toLowerCase()===t?"on":"")});
+  $("thint").textContent=HINTS[t];renderGroups();renderChips();renderRef();view();restart()}
+
+/* ---------- One form ---------- */
+var cur=null,answered=false,score=0,total=0,streak=0,best=0,tv=null;
+function newQuick(){var o=draw("quick",true),vi=o===null?null:o.v;answered=false;$("fb").textContent="";$("fb").className="fb";
+  var a=$("ans");a.value="";a.className="";a.disabled=false;
+  if(vi===null){$("qv").textContent="";$("qe").textContent="";$("qp").textContent="Pick at least one verb above.";cur=null;return}
+  var d=DS()[vi],pi=o.p;cur={v:vi,p:pi};if(WRAP){roundMsg("fb","Round complete: "+score+"/"+total+". All questions asked, starting a new round.");score=0;total=0;streak=0;upd()}
+  $("qv").textContent=d[0];$("qe").textContent=d[1];
+  $("qp").innerHTML="<b>"+pron(pi,d[2][pi],d[4]).trim()+"</b> …";
+  $("check").textContent="Check";if(document.activeElement!==a)a.focus({preventScroll:true})}
+function upd(){$("sc").textContent=score;$("tot").textContent=total;$("st").textContent=streak;$("bs").textContent=best}
+function checkQuick(){if(!cur)return;
+  if(answered){newQuick();return}
+  var d=DS()[cur.v],right=d[2][cur.p],a=$("ans"),fb=$("fb");
+  if(!a.value.trim())return;
+  total++;answered=true;
+  if(match(a.value,right)){score++;streak++;if(streak>best)best=streak;a.className="ok";fb.className="fb ok";fb.textContent="Correct: "+showAns(cur.p,right,d[4])}
+  else{streak=0;a.className="bad";fb.className="fb bad";fb.textContent="Answer: "+showAns(cur.p,right,d[4])}
+  $("check").textContent="Next";upd()}
+function skipQuick(){if(!cur)return;if(!answered){total++;streak=0;upd()}newQuick()}
+$("ans").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();checkQuick()}});
+
+/* ---------- Full table ---------- */
+function newTable(){var vi=pick("table");tv=vi;var wr=WRAP;var g=$("tg");g.innerHTML="";$("tfb").textContent="";$("tfb").className="fb";
+  if(vi===null){$("tv").textContent="";$("te").textContent="Pick at least one verb above.";return}
+  var d=DS()[vi];if(wr)roundMsg("tfb","All verbs done. Starting a new round.");$("tv").textContent=d[0];$("te").textContent=d[1];
+  for(var i=0;i<6;i++){if(d[4]&&i!==2)continue;var l=document.createElement("label");l.textContent=d[4]?"il":P[i];l.htmlFor="t"+i;
+    var inp=document.createElement("input");inp.type="text";inp.id="t"+i;inp.autocomplete="off";inp.autocapitalize="none";inp.spellcheck=false;
+    g.appendChild(l);g.appendChild(inp)}}
+function checkTable(){if(tv===null)return;var d=DS()[tv],n=0,c=0;
+  for(var i=0;i<6;i++){var inp=$("t"+i);if(!inp)continue;c++;var ok=match(inp.value,d[2][i]);
+    inp.className=ok?"ok":"bad";if(ok)n++;else inp.placeholder=d[2][i].split("/").join(" / ")}
+  var fb=$("tfb");fb.className="fb "+(n===c?"ok":"bad");
+  fb.textContent=n+"/"+c+" correct"+(n<c?". Red boxes show the answer as a placeholder after you clear them.":"")}
+function nextTable(){newTable()}
+
+/* ---------- French → English ---------- */
+var fs=0,ft=0,fk=0,fcur=null,fdone=false;
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function newF(){fdone=false;$("ffb").textContent="";$("ffb").className="fb";var m=$("fo");m.innerHTML="";var vi=pick("fr2en"),L=DS(),wr=WRAP;
+  if(vi===null){$("fv").textContent="Pick at least one verb above.";fcur=null;return}
+  fcur=vi;$("fv").textContent=L[vi][0];
+  if(wr){roundMsg("ffb","Round complete: "+fs+"/"+ft+". Starting a new round.");fs=0;ft=0;fk=0;$("fs").textContent=0;$("ft").textContent=0;$("fk").textContent=0}
+  var others=[];L.forEach(function(d,i){if(i!==vi&&visible(i)&&d[1]!==L[vi][1])others.push(i)});
+  var opts=shuffle(others).slice(0,3);opts.push(vi);shuffle(opts);
+  opts.forEach(function(i){var b=document.createElement("button");b.textContent=L[i][1];b.onclick=function(){ansF(i,b)};m.appendChild(b)})}
+function ansF(i,b){if(fdone||fcur===null)return;fdone=true;ft++;var fb=$("ffb"),btns=$("fo").children,L=DS();
+  if(i===fcur){fs++;fk++;b.className="ok";fb.className="fb ok";fb.textContent="Correct"}
+  else{fk=0;b.className="bad";fb.className="fb bad";fb.textContent=L[fcur][0]+" = "+L[fcur][1];
+    for(var k=0;k<btns.length;k++){if(btns[k].textContent===L[fcur][1])btns[k].className="ok"}}
+  $("fs").textContent=fs;$("ft").textContent=ft;$("fk").textContent=fk}
+
+/* ---------- English → French ---------- */
+var es=0,et=0,ek=0,ecur=null,edone=false;
+function updE(){$("es").textContent=es;$("et").textContent=et;$("ek").textContent=ek}
+function newE(){edone=false;var a=$("ea");a.value="";a.className="";$("efb").textContent="";$("efb").className="fb";$("ec").textContent="Check";
+  var vi=pick("en2fr"),wr=WRAP;if(vi===null){$("ev").textContent="Pick at least one verb above.";ecur=null;return}
+  ecur=vi;$("ev").textContent=DS()[vi][1];
+  if(wr){roundMsg("efb","Round complete: "+es+"/"+et+". Starting a new round.");es=0;et=0;ek=0;updE()}}
+function checkE(){if(ecur===null)return;if(edone){newE();return}
+  var a=$("ea"),fb=$("efb");if(!a.value.trim())return;et++;edone=true;var r=DS()[ecur][0];
+  if(norm(a.value)===norm(r)){es++;ek++;a.className="ok";fb.className="fb ok";fb.textContent="Correct: "+r}
+  else{ek=0;a.className="bad";fb.className="fb bad";fb.textContent="Answer: "+r}
+  $("ec").textContent="Next";updE()}
+function skipE(){if(ecur===null)return;if(!edone){et++;ek=0;updE()}newE()}
+$("ea").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();checkE()}});
+
+/* ---------- Past: auxiliary / participle drills ---------- */
+var PC={cur:null,done:false,s:0,t:0,k:0};
+function pcUpd(){$("ps").textContent=PC.s;$("pt").textContent=PC.t;$("pk").textContent=PC.k}
+function pcRes(ok,msg){var f=$("pfb");PC.done=true;PC.t++;if(ok){PC.s++;PC.k++}else PC.k=0;f.className="fb "+(ok?"ok":"bad");f.textContent=msg;$("pskip").textContent="Next";pcUpd()}
+function pcNew(){if(TN!=="past")return;PC.done=false;var vi=pick("pc"+SUB),wr=WRAP,a=$("pa"),m=$("pm");
+  $("pfb").textContent="";$("pfb").className="fb";a.value="";a.className="";m.innerHTML="";$("pskip").textContent="Skip";
+  if(vi===null){PC.cur=null;$("pq").textContent="Pick at least one verb above.";$("pv").textContent="";$("pe").textContent="";a.hidden=true;$("pcb").hidden=true;return}
+  var x=PC.cur=DS()[vi],aux=(SUB==="aux");if(wr){roundMsg("pfb","Round complete: "+PC.s+"/"+PC.t+". Starting a new round.");PC.s=0;PC.t=0;PC.k=0;pcUpd()}$("pv").textContent=x[0];$("pe").textContent=x[1];a.hidden=aux;$("pcb").hidden=aux;
+  if(aux){$("pq").textContent="Which auxiliary does it use?";["avoir","être"].forEach(function(o){var b=document.createElement("button");b.textContent=o;b.onclick=function(){pcAux(o,b)};m.appendChild(b)})}
+  else{$("pq").textContent="Past participle?"}}
+function pcAux(o,b){if(PC.done||!PC.cur)return;var ok=o===PC.cur[6];b.className=ok?"ok":"bad";var bs=$("pm").children;for(var i=0;i<bs.length;i++){if(bs[i].textContent===PC.cur[6])bs[i].className="ok"}pcRes(ok,ok?"Correct":"Answer: "+PC.cur[6])}
+function pcCheck(){if(!PC.cur)return;if(PC.done){pcNew();return}var a=$("pa"),v=a.value.trim();if(!v)return;var ok=norm(v)===norm(PC.cur[5]);
+  a.className=ok?"ok":"bad";pcRes(ok,(ok?"Correct: ":"Answer: ")+PC.cur[5])}
+function pcSkip(){if(!PC.cur)return;if(!PC.done){PC.t++;PC.k=0;pcUpd()}pcNew()}
+$("pa").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();pcCheck()}});
+
+/* ---------- Cheat sheet ---------- */
+function renderRef(){var L=DS(),past=TN==="past",h="";
+  if(past)h="<tr><th>Verb</th><th>Participle</th><th>Auxiliary</th></tr>";
+  else{h="<tr><th>Verb</th>";P.forEach(function(p){h+="<th>"+p+"</th>"});h+="</tr>"}
+  (TN==="fut"?groups("fut","all"):groups(TN,set)).forEach(function(gr){var g=gr[0],rows="",ord=L.map(function(d,i){return i});
+    if(past&&g==="etre"){var EO=["Devenir","Revenir","Monter","Rester","Sortir","Venir","Aller","Naître","Descendre","Entrer","Rentrer","Tomber","Retourner","Arriver","Mourir","Partir"];
+      ord=ord.filter(function(i){return EO.indexOf(L[i][0])>-1}).sort(function(a,b){return EO.indexOf(L[a][0])-EO.indexOf(L[b][0])})}
+    if(TN==="fut"&&g==="fstem"){var FO=["Être","Avoir","Aller","Faire","Voir","Devoir","Savoir","Pouvoir","Vouloir","Venir","Tenir","Envoyer","Mourir","Courir","Valoir","Pleuvoir","Falloir","Recevoir"];
+      ord.sort(function(a,b){var x=FO.indexOf(L[a][0]),y=FO.indexOf(L[b][0]);return(x<0?99:x)-(y<0?99:y)})}
+    ord.forEach(function(i){var d=L[i];if(d[3]!==g||(!visible(i)&&!(past&&g==="etre")&&TN!=="fut"))return;
+      rows+="<tr><td><b>"+d[0]+"</b><br><small>"+d[1]+(TN==="fut"&&g==="fstem"?" · stem "+d[2][0].replace(/ai$/,"")+"-":"")+"</small></td>";
+      if(past)rows+="<td>"+d[5]+"</td><td>"+d[6]+"</td>";
+      else d[2].forEach(function(f,k){rows+="<td>"+(d[4]&&k!==2?"–":f.split("/").join(" / "))+"</td>"});
+      rows+="</tr>"});
+    if(rows)h+='<tr><td class="gh" colspan="'+(past?3:7)+'">'+GL[g]+"</td></tr>"+rows});
+  $("rt").innerHTML=h;$("rpre").innerHTML=(TN==="fut"?FUT_REG:"");$("rules").innerHTML=(TN==="fut"?FUT_IRR:rulesText())}
+
+/* ---------- Past memory map (order from the handwritten notes; <mark> = underlined part) ---------- */
+var MAP=[
+["1. Special: learn each one by itself","être, faire, naître and mourir have no pattern.",[["être","été","to be"],["faire","fait","to do / to make"],["naître","né","to be born"],["mourir","mort","to die"]]],
+["2. -enir → -enu","Drop the highlighted ir, add u.",[["ven<mark>ir</mark>","venu","to come"],["deven<mark>ir</mark>","devenu","to become"],["reven<mark>ir</mark>","revenu","to come back"],["ten<mark>ir</mark>","tenu","to hold"],["obten<mark>ir</mark>","obtenu","to obtain"],["absten<mark>ir</mark>","abstenu","to abstain"]]],
+["3. Ends in -u (set 1)","Short, one-syllable participles.",[["avoir","eu","to have"],["boire","bu","to drink"],["croire","cru","to believe"],["lire","lu","to read"]]],
+["4. Ends in -u (set 2, -oir verbs)","Last four are in the box in your notes.",[["voir","vu","to see"],["savoir","su","to know"],["devoir","dû","must / to owe"],["pouvoir","pu","can / to be able to"],["vouloir","voulu","to want"],["valoir","valu","to be worth"],["falloir","fallu","to be necessary"],["pleuvoir","plu","to rain"]]],
+["5. Ends in -is","prendre family plus mettre family.",[["prendre","pris","to take"],["apprendre","appris","to learn"],["comprendre","compris","to understand"],["mettre","mis","to put"],["permettre","permis","to allow"]]],
+["6. -rir → -ert","Highlighted rir becomes ert.",[["couv<mark>rir</mark>","couvert","to cover"],["off<mark>rir</mark>","offert","to offer"],["ouv<mark>rir</mark>","ouvert","to open"],["découv<mark>rir</mark>","découvert","to discover"],["souff<mark>rir</mark>","souffert","to suffer"]]],
+["7. More -u verbs","Note the ç in reçu and déçu.",[["recevoir","reçu","to receive"],["décevoir","déçu","to disappoint"],["connaître","connu","to know (a person or place)"],["courir","couru","to run"]]],
+["8a. -ire → -it","Highlighted ire becomes it.",[["d<mark>ire</mark>","dit","to say"],["écr<mark>ire</mark>","écrit","to write"],["condu<mark>ire</mark>","conduit","to drive / to lead"],["construire".replace("ire","<mark>ire</mark>"),"construit","to build"],["instru<mark>ire</mark>","instruit","to instruct"],["produ<mark>ire</mark>","produit","to produce"],["rédu<mark>ire</mark>","réduit","to reduce"]]],
+["8b. -dre → -t","Highlighted dre becomes t (ending -int).",[["atteind<mark>re</mark>","atteint","to reach"],["craind<mark>re</mark>","craint","to fear"],["joind<mark>re</mark>","joint","to join"],["peind<mark>re</mark>","peint","to paint"]]],
+["8c. -re → -i","Drop re, add i.",[["ri<mark>re</mark>","ri","to laugh"],["suiv<mark>re</mark>","suivi","to follow"]]]
+];
+var ETV=[["Devenir","to become"],["Revenir","to come back"],["Monter","to climb"],["Rester","to stay"],["Sortir","to go out"],["Venir","to come"],["Aller","to go"],["Naître","to be born"],["Descendre","to descend"],["Entrer","to enter"],["Rentrer","to re-enter"],["Tomber","to fall"],["Retourner","to turn around"],["Arriver","to arrive"],["Mourir","to die"],["Partir","to leave"]];
+var AGR=[["je","nothing","e"],["tu","nothing","e"],["il","nothing","not applicable"],["elle","not applicable","e"],["nous","s","es"],["vous","s","es"],["ils","s","not applicable"],["elles","not applicable","es"]];
+var ETPART=["*devenu","*revenu","monté","resté","sorti","*venu","allé","*né","descendu","entré","rentré","tombé","retourné","arrivé","*mort","parti"];
+function mapIntro(){var h="<h3>Formula</h3><p><b>subject + avoir/être (present) + past participle</b></p>";
+  h+="<h3>Step 1: Find the auxiliary</h3><p class='tip'>These 16 verbs use être (DR MRS VANDERTRAMP). Every other verb uses avoir. Highlighted participles are irregular. Reflexive (pronominal) verbs also use être.</p><div class='wrap'><table><tr><th>Verb</th><th>Participle</th><th>English</th></tr>";
+  ETV.forEach(function(r,i){var p=ETPART[i],irr=p.charAt(0)==="*";if(irr)p=p.slice(1);h+="<tr><td><mark>"+r[0].charAt(0)+"</mark>"+r[0].slice(1).toLowerCase()+"</td><td class='pp'>"+(irr?"<mark>"+p+"</mark>":p)+"</td><td class='en'>"+r[1]+"</td></tr>"});
+  h+="</table></div>";
+  h+="<h3>Step 2: Regular participles</h3><p class='tip'>Use this only if the verb is not in the irregular list below.</p><div class='wrap'><table><tr><th>Ending</th><th>Rule</th><th>Example</th></tr><tr><td><mark>-er</mark></td><td>replace er with é</td><td class='pp'>parler → parlé</td></tr><tr><td><mark>-ir</mark></td><td>remove the r</td><td class='pp'>finir → fini</td></tr><tr><td><mark>-re</mark></td><td>replace re with u</td><td class='pp'>vendre → vendu</td></tr></table></div>";
+  h+="<h3>Step 3: Irregular participles</h3><p class='tip'>Same order as your notes. Highlighted letters are the underlined part of the infinitive.</p>";return h}
+function mapAgree(){var h="<h3>Step 4: Agreement (être verbs only)</h3><p class='tip'>Add the ending to the participle, following the subject.</p><div class='wrap'><table><tr><th>Subject</th><th>Masculine</th><th>Feminine</th></tr>";
+  AGR.forEach(function(r){h+="<tr><td><b>"+r[0]+"</b></td><td>"+r[1]+"</td><td>"+r[2]+"</td></tr>"});
+  return h+"</table></div><p class='tip'>Examples: je suis allé (m) / allé<mark>e</mark> (f); nous sommes allé<mark>s</mark> (m) / allé<mark>es</mark> (f); elle est allé<mark>e</mark>; elles sont allé<mark>es</mark>.</p>"}
+function renderMap(){var h=mapIntro();
+  MAP.forEach(function(g){h+="<h3>"+g[0]+"</h3><p class='tip'>"+g[1]+"</p><div class='wrap'><table><tr><th>Infinitive</th><th>Participle</th><th>English</th></tr>";
+    g[2].forEach(function(r){h+="<tr><td>"+r[0]+"</td><td class='pp'>"+r[1]+"</td><td class='en'>"+r[2]+"</td></tr>"});h+="</table></div>"});
+  $("map").innerHTML=h+mapAgree()}
+
+$("thint").textContent=HINTS[TN];
+renderMap();renderGroups();renderChips();renderRef();view();newQuick();newTable();newF();newE();upd();
+</script>
+<script>
+(function(){
+// Room client over WebSocket. Same interface the quiz game uses: presence(), peers(), onPeers(), connected(), leave().
+var ws=null,handlers=[],errHandlers=[],snap=[],mine={},myId=null,closing=false,retry=0,openWaiters=[],timer=null;
+function url(){return (location.protocol==="https:"?"wss://":"ws://")+location.host+"/ws"}
+function fire(){var s=snap.slice();handlers.forEach(function(h){try{h({peers:s,joined:[],left:[],updated:[]})}catch(e){}})}
+function selfEntry(){return{peer:myId||"me",isMe:true,sameTab:true,kind:"viewer",presence:Object.freeze(Object.assign({},mine))}}
+function connect(){
+  try{ws=new WebSocket(url())}catch(e){schedule();return}
+  ws.onopen=function(){retry=0;var w=openWaiters;openWaiters=[];w.forEach(function(f){f(true)});
+    if(Object.keys(mine).length)ws.send(JSON.stringify({type:"presence",patch:mine}))};
+  ws.onmessage=function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+    if(m.type==="hello"){myId=m.id}
+    else if(m.type==="peers"){snap=m.peers.map(function(p){if(p.isMe){p.presence=Object.freeze(Object.assign({},mine))}return p});fire()}
+    else if(m.type==="error"){errHandlers.forEach(function(h){h({code:m.code})})}};
+  ws.onclose=function(){ws=null;if(!closing)schedule()};
+  ws.onerror=function(){};
+}
+function schedule(){retry++;clearTimeout(timer);timer=setTimeout(connect,Math.min(1000*retry,5000))}
+function waitOpen(ms){return new Promise(function(res){
+  if(ws&&ws.readyState===1)return res(true);
+  var done=false;function f(v){if(!done){done=true;res(v)}}
+  openWaiters.push(f);setTimeout(function(){f(false)},ms)})}
+var room={
+  peers:function(){return snap.length?snap.slice():[selfEntry()]},
+  presence:function(p){for(var k in p){if(p[k]===null)delete mine[k];else mine[k]=p[k]}
+    snap=snap.filter(function(x){return!x.isMe});snap.unshift(selfEntry());fire();
+    if(ws&&ws.readyState===1)ws.send(JSON.stringify({type:"presence",patch:p}));
+    return Promise.resolve()},
+  onPeers:function(h,eh){handlers.push(h);if(eh)errHandlers.push(eh);
+    setTimeout(fire,0);
+    return function(){handlers=handlers.filter(function(x){return x!==h});if(eh)errHandlers=errHandlers.filter(function(x){return x!==eh})}},
+  connected:function(){return!!ws&&ws.readyState===1},
+  leave:function(){mine={};snap=[]}
+};
+window.claude={use:async function(n){
+  if(n!=="room")return null;
+  if(!ws){closing=false;connect()}
+  var ok=await waitOpen(70000);   // free hosting can take ~1 minute to wake up
+  return ok?room:null}};
+})();
+</script>
+<script>
+/* ---------- Play with friends (live rooms via the room capability) ---------- */
+(function(){
+var $=function(i){return document.getElementById(i)};
+var GP=["je","tu","il/elle","nous","vous","ils/elles"];
+var QT=20000,CAP=28000;
+var ROOM=null,UNSUB=null,GS={screen:"join",G:null,cfg:null,n:0,qs:[],i:-1,shownAt:0,answered:false,picked:-1,score:0,correct:0,ms:0,ignoreG:null,adv:false,tick:null,pending:null};
+window.__gs=GS;
+
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuf(a,R){for(var i=a.length-1;i>0;i--){var j=Math.floor(R()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function fv(s){return s.split("/")[0]}
+function gReg(tn,d){if(tn==="pres")return REG.indexOf(d[3])>-1;if(tn==="fut")return d[3]!=="fstem";return IRRN.indexOf(d[0])<0}
+function key(s){return s.toLowerCase().split(" ").slice(0,2).join(" ")}
+
+function qForm(d,all,R){var pi=d[4]?2:Math.floor(R()*6),ans=fv(d[2][pi]),dist=[];
+  shuf(d[2].map(fv),R).forEach(function(t){if(t!==ans&&dist.indexOf(t)<0&&dist.length<3)dist.push(t)});
+  if(dist.length<3)shuf(all.slice(),R).forEach(function(o){var t=fv(o[2][pi]);if(o!==d&&t!==ans&&dist.indexOf(t)<0&&dist.length<3)dist.push(t)});
+  var opts=shuf([ans].concat(dist),R);
+  return{t:"form",verb:d[0],eng:d[1],pron:d[4]?"il":GP[pi],opts:opts,ans:opts.indexOf(ans)}}
+function qMean(d,all,R){var ans=d[1],ks=[key(ans)],dist=[];
+  shuf(all.slice(),R).forEach(function(o){var k=key(o[1]);if(dist.length<3&&ks.indexOf(k)<0){ks.push(k);dist.push(o[1])}});
+  var opts=shuf([ans].concat(dist),R);
+  return{t:"mean",verb:d[0],opts:opts,ans:opts.indexOf(ans)}}
+function buildQs(cfg){var R=rng(cfg.seed),all=D[cfg.tn],
+    pool=all.filter(function(d){return cfg.set==="all"||(cfg.set==="reg")===gReg(cfg.tn,d)});
+  if(!pool.length)pool=all.slice();
+  var order=[];while(order.length<cfg.n)order=order.concat(shuf(pool.slice(),R));order=order.slice(0,cfg.n);
+  return order.map(function(d){var k=cfg.kind==="mix"?(R()<.5?"form":"mean"):cfg.kind;return k==="form"?qForm(d,all,R):qMean(d,all,R)})}
+
+/* ---------- room helpers ---------- */
+function pres(p){try{var r=ROOM.presence(p);if(r&&r.catch)r.catch(function(e){GS.connErr=(e&&e.code)||"error";updConn()})}catch(e){}}
+function nm(p){return String(p.presence.n||"Player").slice(0,16)}
+function players(){return ROOM?ROOM.peers().filter(function(p){return p.kind==="viewer"&&p.presence&&typeof p.presence.t==="number"&&p.presence.rc===GS.rc}):[]}
+function hostOf(ps){return ps.slice().sort(function(a,b){return a.presence.t-b.presence.t||(a.peer<b.peer?-1:1)})[0]}
+function inGame(){return players().filter(function(p){return GS.G&&p.presence.g===GS.G})}
+function sorted(ps){return ps.slice().sort(function(a,b){return(b.presence.s||0)-(a.presence.s||0)||(a.presence.ms||0)-(b.presence.ms||0)})}
+function scr(name){GS.screen=name;[["join","gJoin"],["lobby","gLobby"],["play","gQ"],["end","gEnd"]].forEach(function(x){$(x[1]).hidden=(x[0]!==name)})}
+function msg(t){$("gMsg").className="fb bad";$("gMsg").textContent=t}
+function cell(tr,text,tag){var c=document.createElement(tag||"td");c.textContent=text;tr.appendChild(c)}
+function renderBoard(tbl,ps){tbl.innerHTML="";var h=document.createElement("tr");["#","Player","Score","Progress"].forEach(function(t){cell(h,t,"th")});tbl.appendChild(h);
+  sorted(ps).forEach(function(p,i){var tr=document.createElement("tr");if(p.sameTab)tr.className="me";
+    cell(tr,String(i+1));cell(tr,nm(p)+(p.sameTab?" (you)":""));cell(tr,String(p.presence.s||0));
+    cell(tr,p.presence.st==="done"?"done":Math.min(p.presence.a||0,GS.n)+"/"+GS.n);tbl.appendChild(tr)})}
+
+/* ---------- join / lobby ---------- */
+function cleanName(s){return s.replace(/[^\p{L}\p{N} _.-]/gu,"").trim().slice(0,16)}
+function stubRoom(){var pr={},hs=[];
+  var me={peer:"solo",by:null,isMe:true,sameTab:true,kind:"viewer",guest:false,updatedAt:Date.now()};
+  Object.defineProperty(me,"presence",{get:function(){return pr}});
+  function fire(){hs.forEach(function(h){h({peers:[me]})})}
+  return{stub:true,presence:function(p){for(var k in p){if(p[k]===null)delete pr[k];else pr[k]=p[k]}setTimeout(fire,0);return Promise.resolve()},
+    peers:function(){return[me]},onPeers:function(h){hs.push(h);setTimeout(fire,0);return function(){}},leave:function(){return Promise.resolve()},connected:function(){return true}}}
+var TNm={p:"pres",a:"past",f:"fut"},SETm={a:"all",i:"irr",r:"reg"},KDm={m:"mix",f:"form",n:"mean"},RES=[];
+function rk(o,v){for(var k in o)if(o[k]===v)return k}
+function mkCode(cfg){return rk(TNm,cfg.tn)+rk(SETm,cfg.set)+rk(KDm,cfg.kind)+cfg.n+"-"+cfg.seed.toString(36)}
+function parseCode(s){var m=/^([paf])([air])([mfn])(\d{1,2})-([a-z0-9]{1,8})$/.exec((s||"").toLowerCase().replace(/[^a-z0-9-]/g,""));if(!m)return null;
+  var n=parseInt(m[4],10),seed=parseInt(m[5],36);if(n<3||n>30||!isFinite(seed))return null;return{tn:TNm[m[1]],set:SETm[m[2]],kind:KDm[m[3]],n:n,seed:seed}}
+function chmsg(t,ok){$("chMsg").className="fb"+(ok?" ok":" bad");$("chMsg").textContent=t}
+function createChallenge(){var cfg={tn:$("chTn").value,set:$("chSet").value,kind:$("chKind").value,n:parseInt($("chN").value,10),seed:Math.floor(Math.random()*2147483647)};
+  var c=mkCode(cfg);$("chCode").value=c.toUpperCase();chmsg("Code created: "+c.toUpperCase()+". Send it to your friends, then press Start challenge.",true)}
+function startChallenge(){var name=cleanName($("gName").value)||"Player",cfg=parseCode($("chCode").value);
+  if(!cfg){chmsg("That code is not valid. A code looks like AAM10-45A3P2. Paste it exactly as your friend sent it, or create a new one.");return}
+  try{localStorage.setItem("fq-name",name)}catch(e){}
+  GS.challenge=true;GS.code=$("chCode").value.trim().toLowerCase();RES=[];$("chPaste").value="";$("chAddMsg").textContent="";
+  enterRoom(stubRoom(),"challenge",name);beginGame("c-"+GS.code,cfg,true)}
+function myResult(){var p=ROOM?ROOM.peers().filter(function(x){return x.sameTab})[0]:null;var nmm=p?nm(p):"Player";
+  return[nmm,GS.score,GS.correct,GS.n,Math.round(GS.ms/1000)].join("|")}
+function renderChal(){var mine=myResult();$("chMine").value=mine;
+  var rows=[{r:mine,me:true}].concat(RES.map(function(r){return{r:r,me:false}}));
+  var t=$("chTable");t.innerHTML="";var h=document.createElement("tr");["#","Player","Score","Correct","Time"].forEach(function(x){cell(h,x,"th")});t.appendChild(h);
+  rows.map(function(o){var a=o.r.split("|");return{name:a[0],s:+a[1],c:+a[2],n:+a[3],t:+a[4],me:o.me}})
+    .sort(function(a,b){return b.s-a.s||a.t-b.t}).forEach(function(o,i){var tr=document.createElement("tr");if(o.me)tr.className="me";
+      cell(tr,String(i+1));cell(tr,o.name+(o.me?" (you)":""));cell(tr,String(o.s));cell(tr,o.c+"/"+o.n);cell(tr,o.t+"s");t.appendChild(tr)});
+  $("gWin").textContent="Challenge complete: "+GS.score+" points, "+GS.correct+" of "+GS.n+" correct."}
+function addResults(){var added=0,bad=0;$("chPaste").value.split(/\n/).forEach(function(l){l=l.trim();if(!l)return;var a=l.split("|");
+    if(a.length!==5||!isFinite(+a[1])||!isFinite(+a[2])||!isFinite(+a[3])||!isFinite(+a[4])){bad++;return}
+    a[0]=cleanName(a[0])||"Player";var s=a.join("|");if(RES.indexOf(s)<0&&s!==myResult()){RES.push(s);added++}});
+  $("chAddMsg").className="fb"+(bad?" bad":" ok");$("chAddMsg").textContent=added+" added"+(bad?", "+bad+" line(s) not understood":"");if(added)$("chPaste").value="";renderChal()}
+function copyResult(){var el=$("chMine");try{navigator.clipboard.writeText(el.value).then(function(){$("chAddMsg").className="fb ok";$("chAddMsg").textContent="Copied"},function(){el.select()})}catch(e){el.select()}}
+function updConn(){var b=$("gConn");if(ROOM&&!GS.solo){var all=0;try{all=ROOM.peers().length}catch(e){}var ok=true;try{ok=ROOM.connected?ROOM.connected():true}catch(e){}$("gDiag").textContent="Status: "+(ok?"connected":"not connected")+" \u2022 people in this room: "+players().length+" \u2022 open pages seen: "+all+(GS.connErr?" \u2022 error: "+GS.connErr:"")}else $("gDiag").textContent="";if(!ROOM||GS.solo){b.hidden=true;$("gStart").disabled=false;return}
+  var bad=GS.connErr||(GS.downSince&&Date.now()-GS.downSince>2500);
+  if(bad){b.hidden=false;b.textContent="Not connected to the game server"+(GS.connErr?" ("+GS.connErr+")":"")+". Reconnecting… or use a challenge code instead.";$("gStart").disabled=true;return}
+  $("gStart").disabled=false;
+  if(GS.screen==="lobby"&&players().length<2&&Date.now()-GS.joinedAt>8000){b.hidden=false;b.textContent="Only you are in this room. If your friend used the same code and does not appear here, check that the room code matches exactly, or use a challenge code."}
+  else b.hidden=true}
+function monitor(){clearInterval(GS.mon);GS.mon=setInterval(function(){if(!ROOM)return;
+  var c=true;try{c=ROOM.connected?ROOM.connected():true}catch(e){}
+  if(!c){if(!GS.downSince)GS.downSince=Date.now()}else GS.downSince=0;updConn()},1000)}
+function enterRoom(room,code,name){ROOM=room;GS.solo=!!room.stub;GS.connErr=null;GS.downSince=0;GS.joinedAt=Date.now();$("gRoomCode").textContent=code;GS.ignoreG=null;GS.G=null;GS.rc=code;monitor();
+  pres({n:name,t:Date.now(),st:"lobby",rc:code});
+  UNSUB=ROOM.onPeers(onNet,function(e){GS.connErr=(e&&e.code)||"error";updConn()});
+  scr("lobby");onNet()}
+async function doJoin(){var name=cleanName($("gName").value),code=($("gCode").value||"").toLowerCase().replace(/[^a-z0-9_.-]/g,"").replace(/^[^a-z0-9]+/,"").slice(0,20);
+  if(!name){msg("Enter your name.");return}
+  if(!code){msg("Enter a room code.");return}
+  try{localStorage.setItem("fq-name",name)}catch(e){}
+  $("gMsg").className="fb";$("gMsg").textContent="Connecting…";
+  var room=null;try{room=(window.claude&&window.claude.use)?await window.claude.use("room"):null}catch(e){}
+  if(!room){msg("Could not reach the game server. Wait a minute and try again, or play solo.");return}
+  var nr=room;
+  $("gMsg").textContent="";GS.challenge=false;enterRoom(nr,code,name)}
+function doSolo(){var name=cleanName($("gName").value)||"You";GS.challenge=false;enterRoom(stubRoom(),"solo",name)}
+function leaveRoom(){clearInterval(GS.mon);clearInterval(GS.tick);GS.tick=null;GS.adv=false;try{if(UNSUB)UNSUB()}catch(e){}try{if(ROOM&&!GS.solo){pres({t:null,rc:null,st:null,g:null,cfg:null,a:null,s:null,c:null,ms:null,n:null});if(typeof ROOM.leave==="function")ROOM.leave()}}catch(e){}ROOM=null;UNSUB=null;GS.G=null;GS.challenge=false;scr("join")}
+function backToLobby(){clearInterval(GS.tick);GS.tick=null;GS.adv=false;GS.pending=null;
+  pres({st:"lobby",g:null,cfg:null,a:0,s:0,c:0,ms:0});scr("lobby");onNet()}
+
+function renderLobby(ps){var box=$("gPlayers");box.innerHTML="";var h=hostOf(ps);
+  ps.forEach(function(p){var s=document.createElement("span");if(p.sameTab)s.className="me";s.textContent=(h&&p.peer===h.peer?"★ ":"")+nm(p)+(p.sameTab?" (you)":"");box.appendChild(s)});
+  var isHost=!!(h&&h.sameTab);$("gCfg").hidden=!isHost;
+  $("gWait").hidden=isHost;if(!isHost&&h)$("gWait").textContent="Waiting for "+nm(h)+" (host) to start the game.";
+  $("gSpec").hidden=!(h&&h.presence.st==="play"&&GS.ignoreG&&h.presence.g===GS.ignoreG)}
+function startGame(){var cfg={tn:$("cTn").value,set:$("cSet").value,kind:$("cKind").value,n:parseInt($("cN").value,10),seed:Math.floor(Math.random()*2147483647)};
+  var g="g"+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36);beginGame(g,cfg,true)}
+function beginGame(g,cfg,asHost){GS.G=g;GS.cfg=cfg;GS.n=cfg.n;GS.qs=buildQs(cfg);GS.i=-1;GS.score=0;GS.correct=0;GS.ms=0;GS.answered=false;GS.adv=false;GS.pending=null;
+  var patch={st:"play",g:g,a:0,s:0,c:0,ms:0};if(asHost)patch.cfg=cfg;pres(patch);
+  scr("play");$("gScore").textContent="0";$("gProg").textContent="Get ready";$("gOpts").innerHTML="";$("gFb").textContent="";$("gFb").className="fb";
+  $("gVerb").textContent="Get ready…";$("gEng").textContent="";$("gAsk").textContent="";$("gBarI").style.width="100%";
+  clearInterval(GS.tick);GS.tick=setInterval(tickFn,200);countdown(3,g);onNet()}
+function countdown(n,g){if(GS.G!==g||GS.screen!=="play")return;if(n===0){showQ(0);return}$("gAsk").textContent="Starting in "+n;setTimeout(function(){countdown(n-1,g)},1000)}
+
+/* ---------- questions ---------- */
+function showQ(i){GS.i=i;GS.answered=false;GS.picked=-1;GS.adv=false;GS.shownAt=Date.now();var q=GS.qs[i];
+  $("gProg").textContent="Question "+(i+1)+" of "+GS.n;$("gScore").textContent=GS.score;$("gBarI").style.width="100%";$("gFb").textContent="";$("gFb").className="fb";
+  $("gVerb").textContent=q.verb;$("gEng").textContent=q.t==="form"?q.eng:"";
+  $("gAsk").innerHTML="";if(q.t==="form"){$("gAsk").appendChild(document.createTextNode("Which form goes with "));var b=document.createElement("b");b.textContent=q.pron;$("gAsk").appendChild(b);$("gAsk").appendChild(document.createTextNode("?"))}else $("gAsk").textContent="What does it mean?";
+  var m=$("gOpts");m.innerHTML="";q.opts.forEach(function(t,k){var bt=document.createElement("button");bt.textContent=t;bt.onclick=function(){submit(k)};m.appendChild(bt)})}
+function submit(k){if(GS.answered||GS.screen!=="play"||GS.i<0)return;GS.answered=true;GS.picked=k;var q=GS.qs[GS.i],ok=k===q.ans,t=Math.min(Date.now()-GS.shownAt,QT);
+  var pts=ok?10+Math.max(0,Math.round(5*(1-t/15000))):0;GS.score+=pts;if(ok)GS.correct++;GS.ms+=t;
+  pres({a:GS.i+1,s:GS.score,c:GS.correct,ms:GS.ms});
+  var bs=$("gOpts").children;for(var j=0;j<bs.length;j++){bs[j].disabled=true;if(j===q.ans)bs[j].className="ok";else if(j===k)bs[j].className="bad"}
+  $("gScore").textContent=GS.score;var f=$("gFb");f.className="fb "+(ok?"ok":"bad");f.textContent=k<0?"Time is up. Answer: "+q.opts[q.ans]:(ok?"Correct, +"+pts:"Not quite. Answer: "+q.opts[q.ans]);
+  onNet()}
+function others(){return inGame().filter(function(p){return !p.sameTab&&p.presence.st==="play"})}
+function allAnswered(){return others().every(function(p){return(p.presence.a||0)>=GS.i+1})}
+function checkAdvance(){if(!GS.answered||GS.adv||GS.screen!=="play")return;
+  var all=allAnswered();if(all||Date.now()-GS.shownAt>=CAP){GS.adv=true;var i=GS.i,g=GS.G;setTimeout(function(){if(GS.G===g&&GS.i===i&&GS.screen==="play")goNext()},all?1500:0)}
+  else{var w=others().filter(function(p){return(p.presence.a||0)<GS.i+1}).length;if(w&&!GS.adv)$("gFb").textContent=$("gFb").textContent.replace(/ • Waiting.*$/,"")+" • Waiting for "+w+" player"+(w>1?"s":"")}}
+function goNext(){if(GS.i+1>=GS.n)finish();else showQ(GS.i+1)}
+function tickFn(){if(GS.screen!=="play"||GS.i<0)return;var el=Date.now()-GS.shownAt;
+  if(!GS.answered){$("gBarI").style.width=Math.max(0,100*(1-el/QT))+"%";if(el>=QT)submit(-1)}else checkAdvance()}
+function finish(){clearInterval(GS.tick);GS.tick=null;pres({st:"done",a:GS.n});scr("end");onNet()}
+
+/* ---------- network updates ---------- */
+function renderEnd(){$("gChal").hidden=!GS.challenge;$("gBack").hidden=!!GS.challenge;$("gFinal").hidden=!!GS.challenge;if(GS.challenge){renderChal();return}var ps=inGame();renderBoard($("gFinal"),ps);
+  var done=ps.length>0&&ps.every(function(p){return p.presence.st==="done"});var w=$("gWin");
+  if(!done){w.textContent="Final scores so far. Waiting for others to finish…"}
+  else{var s=sorted(ps),top=s[0],tie=s.filter(function(p){return(p.presence.s||0)===(top.presence.s||0)&&(p.presence.ms||0)===(top.presence.ms||0)});
+    w.textContent=tie.length>1?"It is a tie: "+tie.map(nm).join(", "):(top.sameTab?"You win!":nm(top)+" wins!")}}
+function onNet(){if(!ROOM)return;var ps=players(),h=hostOf(ps);updConn();
+  if(GS.screen==="lobby"){renderLobby(ps);
+    if(h&&h.presence.st==="play"&&h.presence.g&&h.presence.g!==GS.G&&h.presence.g!==GS.ignoreG){
+      var g=h.presence.g,maxA=0;ps.forEach(function(p){if(p.presence.g===g)maxA=Math.max(maxA,p.presence.a||0)});
+      if(maxA===0&&h.presence.cfg)beginGame(g,h.presence.cfg,false);else{GS.ignoreG=g;renderLobby(ps)}}}
+  else if(GS.screen==="play"){renderBoard($("gBoard"),inGame());checkAdvance()}
+  else if(GS.screen==="end"){renderEnd();
+    var nb=$("gNew");nb.hidden=true;
+    if(h&&h.presence.st==="play"&&h.presence.g&&h.presence.g!==GS.G&&h.presence.cfg){var mx=0;ps.forEach(function(p){if(p.presence.g===h.presence.g)mx=Math.max(mx,p.presence.a||0)});
+      if(mx===0){GS.pending={g:h.presence.g,cfg:h.presence.cfg};nb.hidden=false}}}}
+
+/* ---------- wiring ---------- */
+function app(m){$("practice").hidden=(m!=="prac");$("play").hidden=(m!=="play");$("aPrac").className=(m==="prac"?"on":"");$("aPlay").className=(m==="play"?"on":"")}
+$("aPrac").onclick=function(){app("prac")};$("aPlay").onclick=function(){app("play")};
+$("chCreate").onclick=createChallenge;$("chStart").onclick=startChallenge;$("chAdd").onclick=addResults;$("chCopy").onclick=copyResult;$("gJoinBtn").onclick=doJoin;$("gSoloBtn").onclick=doSolo;$("gStart").onclick=startGame;
+$("gLeave").onclick=leaveRoom;$("gLeave2").onclick=leaveRoom;$("gBack").onclick=backToLobby;
+$("gNewBtn").onclick=function(){if(GS.pending)beginGame(GS.pending.g,GS.pending.cfg,false)};
+$("gCode").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doJoin()}});
+try{var sv=localStorage.getItem("fq-name");if(sv)$("gName").value=sv}catch(e){}
+})();
+</script>
+</body>
+</html>
