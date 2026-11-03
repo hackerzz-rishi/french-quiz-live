@@ -76,6 +76,8 @@ select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);bor
 .banner button{margin-left:8px}
 textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
 .sep{border:0;border-top:1px solid var(--line);margin:18px 0}
+.bigcode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2rem;letter-spacing:.18em;font-weight:700;margin:2px 0 6px;user-select:all}
+.or{text-align:center;color:var(--muted);font-size:.9rem;margin:16px 0 8px}
 .banner.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
 </style>
 </head>
@@ -175,27 +177,22 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
 <section id="play" hidden>
   <div id="gJoin" class="card">
     <p class="q">Play with friends</p>
-    <p class="hint">Everyone types a name and the same room code. The first person in the room is the host and starts the quiz for everyone. The highest score wins.</p>
+    <p class="hint">Create a game, send the code to your friends, and start the quiz once everyone has joined.</p>
     <div class="fld"><label for="gName">Your name</label><input type="text" id="gName" maxlength="16" autocomplete="off"></div>
-    <div class="fld"><label for="gCode">Room code</label><input type="text" id="gCode" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Any word, for example paris7"></div>
-    <div class="row"><button class="primary" id="gJoinBtn">Join room</button><button id="gSoloBtn">Play solo</button></div>
+    <div class="row"><button class="primary" id="gCreateBtn">Create a new game</button></div>
+    <p class="or">or join a friend's game</p>
+    <div class="fld"><label for="gCode">Game code</label><input type="text" id="gCode" maxlength="20" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="For example K7MP2"></div>
+    <div class="row"><button id="gJoinBtn">Join game</button><button id="gSoloBtn">Play solo</button></div>
     <div class="fb" id="gMsg" aria-live="polite"></div>
-    <p class="hint">Share this page link and the same room code with your friends. No sign-in needed. The first visit after a quiet period can take up to a minute to connect.</p>
-    <hr class="sep">
-    <p class="q">Challenge (no sign-in needed)</p>
-    <p class="hint">One person creates a code. Everyone enters it to get the same questions on their own screen, then you compare scores.</p>
-    <div class="fld"><label for="chTn">Tense</label><select id="chTn"><option value="pres">Present</option><option value="past">Past (passé composé)</option><option value="fut">Future</option></select></div>
-    <div class="fld"><label for="chSet">Verbs</label><select id="chSet"><option value="all">Regular and irregular</option><option value="irr">Irregular only</option><option value="reg">Regular only</option></select></div>
-    <div class="fld"><label for="chKind">Questions</label><select id="chKind"><option value="mix">Mixed</option><option value="form">Conjugation</option><option value="mean">Meaning</option></select></div>
-    <div class="fld"><label for="chN">Number of questions</label><select id="chN"><option>10</option><option>15</option><option>20</option></select></div>
-    <div class="row"><button id="chCreate">Create challenge code</button></div>
-    <div class="fld" style="margin-top:12px"><label for="chCode">Challenge code</label><input type="text" id="chCode" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Create one, or paste your friend's code"></div>
-    <div class="row"><button class="primary" id="chStart">Start challenge</button></div>
-    <div class="fb" id="chMsg" aria-live="polite"></div>
+    <p class="hint">No sign-in needed. The first visit after a quiet period can take up to a minute to connect.</p>
   </div>
 
   <div id="gLobby" class="card" hidden>
-    <p class="q">Room <b id="gRoomCode"></b></p>
+    <p class="hint" style="margin:0">Game code</p>
+    <p class="bigcode" id="gRoomCode"></p>
+    <div class="row" id="gShare"><button id="gCopyLink">Copy invite link</button></div>
+    <p class="hint" id="gShareMsg"></p>
+    <p class="q" id="gCount">Players</p>
     <div class="pl" id="gPlayers"></div>
     <div class="banner bad" id="gConn" hidden></div>
     <p class="hint" id="gDiag"></p>
@@ -205,7 +202,7 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
       <div class="fld"><label for="cSet">Verbs</label><select id="cSet"><option value="all">Regular and irregular</option><option value="irr">Irregular only</option><option value="reg">Regular only</option></select></div>
       <div class="fld"><label for="cKind">Questions</label><select id="cKind"><option value="mix">Mixed</option><option value="form">Conjugation</option><option value="mean">Meaning</option></select></div>
       <div class="fld"><label for="cN">Number of questions</label><select id="cN"><option>10</option><option>15</option><option>20</option></select></div>
-      <div class="row"><button class="primary" id="gStart">Start game for everyone</button></div>
+      <div class="row"><button class="primary" id="gStart" disabled>Waiting for friends to join…</button></div>
     </div>
     <p class="hint" id="gWait" hidden></p>
     <div class="row"><button id="gLeave">Leave room</button></div>
@@ -225,16 +222,6 @@ textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);b
   <div id="gEnd" class="card" hidden>
     <p class="q" id="gWin"></p>
     <div class="wrap"><table class="rank" id="gFinal"></table></div>
-    <div id="gChal" hidden>
-      <p class="hint">Send your result line to friends, and paste theirs below to compare.</p>
-      <div class="fld"><label for="chMine">Your result</label><input type="text" id="chMine" readonly></div>
-      <div class="row"><button id="chCopy">Copy my result</button></div>
-      <div class="fld" style="margin-top:12px"><label for="chPaste">Friends' results (one per line)</label><textarea id="chPaste" rows="3" spellcheck="false"></textarea></div>
-      <div class="row"><button class="primary" id="chAdd">Add to comparison</button></div>
-      <div class="fb" id="chAddMsg" aria-live="polite"></div>
-      <div class="wrap"><table class="rank" id="chTable"></table></div>
-    </div>
-    <div class="banner" id="gNew" hidden><span>The host started a new game.</span><button class="primary" id="gNewBtn">Join new game</button></div>
     <div class="row"><button class="primary" id="gBack">Back to lobby</button><button id="gLeave2">Leave room</button></div>
   </div>
 </section>
@@ -617,7 +604,7 @@ function buildQs(cfg){var R=rng(cfg.seed),all=D[cfg.tn],
 function pres(p){try{var r=ROOM.presence(p);if(r&&r.catch)r.catch(function(e){GS.connErr=(e&&e.code)||"error";updConn()})}catch(e){}}
 function nm(p){return String(p.presence.n||"Player").slice(0,16)}
 function players(){return ROOM?ROOM.peers().filter(function(p){return p.kind==="viewer"&&p.presence&&typeof p.presence.t==="number"&&p.presence.rc===GS.rc}):[]}
-function hostOf(ps){return ps.slice().sort(function(a,b){return a.presence.t-b.presence.t||(a.peer<b.peer?-1:1)})[0]}
+function hostOf(ps){return ps.slice().sort(function(a,b){return(b.presence.h?1:0)-(a.presence.h?1:0)||a.presence.t-b.presence.t||(a.peer<b.peer?-1:1)})[0]}
 function inGame(){return players().filter(function(p){return GS.G&&p.presence.g===GS.G})}
 function sorted(ps){return ps.slice().sort(function(a,b){return(b.presence.s||0)-(a.presence.s||0)||(a.presence.ms||0)-(b.presence.ms||0)})}
 function scr(name){GS.screen=name;[["join","gJoin"],["lobby","gLobby"],["play","gQ"],["end","gEnd"]].forEach(function(x){$(x[1]).hidden=(x[0]!==name)})}
@@ -636,64 +623,46 @@ function stubRoom(){var pr={},hs=[];
   function fire(){hs.forEach(function(h){h({peers:[me]})})}
   return{stub:true,presence:function(p){for(var k in p){if(p[k]===null)delete pr[k];else pr[k]=p[k]}setTimeout(fire,0);return Promise.resolve()},
     peers:function(){return[me]},onPeers:function(h){hs.push(h);setTimeout(fire,0);return function(){}},leave:function(){return Promise.resolve()},connected:function(){return true}}}
-var TNm={p:"pres",a:"past",f:"fut"},SETm={a:"all",i:"irr",r:"reg"},KDm={m:"mix",f:"form",n:"mean"},RES=[];
-function rk(o,v){for(var k in o)if(o[k]===v)return k}
-function mkCode(cfg){return rk(TNm,cfg.tn)+rk(SETm,cfg.set)+rk(KDm,cfg.kind)+cfg.n+"-"+cfg.seed.toString(36)}
-function parseCode(s){var m=/^([paf])([air])([mfn])(\d{1,2})-([a-z0-9]{1,8})$/.exec((s||"").toLowerCase().replace(/[^a-z0-9-]/g,""));if(!m)return null;
-  var n=parseInt(m[4],10),seed=parseInt(m[5],36);if(n<3||n>30||!isFinite(seed))return null;return{tn:TNm[m[1]],set:SETm[m[2]],kind:KDm[m[3]],n:n,seed:seed}}
-function chmsg(t,ok){$("chMsg").className="fb"+(ok?" ok":" bad");$("chMsg").textContent=t}
-function createChallenge(){var cfg={tn:$("chTn").value,set:$("chSet").value,kind:$("chKind").value,n:parseInt($("chN").value,10),seed:Math.floor(Math.random()*2147483647)};
-  var c=mkCode(cfg);$("chCode").value=c.toUpperCase();chmsg("Code created: "+c.toUpperCase()+". Send it to your friends, then press Start challenge.",true)}
-function startChallenge(){var name=cleanName($("gName").value)||"Player",cfg=parseCode($("chCode").value);
-  if(!cfg){chmsg("That code is not valid. A code looks like AAM10-45A3P2. Paste it exactly as your friend sent it, or create a new one.");return}
-  try{localStorage.setItem("fq-name",name)}catch(e){}
-  GS.challenge=true;GS.code=$("chCode").value.trim().toLowerCase();RES=[];$("chPaste").value="";$("chAddMsg").textContent="";
-  enterRoom(stubRoom(),"challenge",name);beginGame("c-"+GS.code,cfg,true)}
-function myResult(){var p=ROOM?ROOM.peers().filter(function(x){return x.sameTab})[0]:null;var nmm=p?nm(p):"Player";
-  return[nmm,GS.score,GS.correct,GS.n,Math.round(GS.ms/1000)].join("|")}
-function renderChal(){var mine=myResult();$("chMine").value=mine;
-  var rows=[{r:mine,me:true}].concat(RES.map(function(r){return{r:r,me:false}}));
-  var t=$("chTable");t.innerHTML="";var h=document.createElement("tr");["#","Player","Score","Correct","Time"].forEach(function(x){cell(h,x,"th")});t.appendChild(h);
-  rows.map(function(o){var a=o.r.split("|");return{name:a[0],s:+a[1],c:+a[2],n:+a[3],t:+a[4],me:o.me}})
-    .sort(function(a,b){return b.s-a.s||a.t-b.t}).forEach(function(o,i){var tr=document.createElement("tr");if(o.me)tr.className="me";
-      cell(tr,String(i+1));cell(tr,o.name+(o.me?" (you)":""));cell(tr,String(o.s));cell(tr,o.c+"/"+o.n);cell(tr,o.t+"s");t.appendChild(tr)});
-  $("gWin").textContent="Challenge complete: "+GS.score+" points, "+GS.correct+" of "+GS.n+" correct."}
-function addResults(){var added=0,bad=0;$("chPaste").value.split(/\n/).forEach(function(l){l=l.trim();if(!l)return;var a=l.split("|");
-    if(a.length!==5||!isFinite(+a[1])||!isFinite(+a[2])||!isFinite(+a[3])||!isFinite(+a[4])){bad++;return}
-    a[0]=cleanName(a[0])||"Player";var s=a.join("|");if(RES.indexOf(s)<0&&s!==myResult()){RES.push(s);added++}});
-  $("chAddMsg").className="fb"+(bad?" bad":" ok");$("chAddMsg").textContent=added+" added"+(bad?", "+bad+" line(s) not understood":"");if(added)$("chPaste").value="";renderChal()}
-function copyResult(){var el=$("chMine");try{navigator.clipboard.writeText(el.value).then(function(){$("chAddMsg").className="fb ok";$("chAddMsg").textContent="Copied"},function(){el.select()})}catch(e){el.select()}}
-function updConn(){var b=$("gConn");if(ROOM&&!GS.solo){var all=0;try{all=ROOM.peers().length}catch(e){}var ok=true;try{ok=ROOM.connected?ROOM.connected():true}catch(e){}$("gDiag").textContent="Status: "+(ok?"connected":"not connected")+" \u2022 people in this room: "+players().length+" \u2022 open pages seen: "+all+(GS.connErr?" \u2022 error: "+GS.connErr:"")}else $("gDiag").textContent="";if(!ROOM||GS.solo){b.hidden=true;$("gStart").disabled=false;return}
+function updConn(){var b=$("gConn");if(ROOM&&!GS.solo){var all=0;try{all=ROOM.peers().length}catch(e){}var ok=true;try{ok=ROOM.connected?ROOM.connected():true}catch(e){}$("gDiag").textContent="Status: "+(ok?"connected":"not connected")+" \u2022 people in this room: "+players().length+" \u2022 open pages seen: "+all+(GS.connErr?" \u2022 error: "+GS.connErr:"")}else $("gDiag").textContent="";var st=$("gStart"),np=players().length;
+  if(!ROOM||GS.solo){b.hidden=true;st.disabled=false;st.textContent="Start quiz";return}
   var bad=GS.connErr||(GS.downSince&&Date.now()-GS.downSince>2500);
-  if(bad){b.hidden=false;b.textContent="Not connected to the game server"+(GS.connErr?" ("+GS.connErr+")":"")+". Reconnecting… or use a challenge code instead.";$("gStart").disabled=true;return}
-  $("gStart").disabled=false;
-  if(GS.screen==="lobby"&&players().length<2&&Date.now()-GS.joinedAt>8000){b.hidden=false;b.textContent="Only you are in this room. If your friend used the same code and does not appear here, check that the room code matches exactly, or use a challenge code."}
+  if(bad){b.hidden=false;b.textContent="Not connected to the game server"+(GS.connErr?" ("+GS.connErr+")":"")+". Reconnecting…";st.disabled=true;return}
+  // the host can only start once at least one friend has joined
+  st.disabled=np<2;st.textContent=np<2?"Waiting for friends to join…":"Start quiz for "+np+" players";
+  var meHost=(function(){var h=hostOf(players());return!!(h&&h.sameTab)})();
+  if(GS.screen==="lobby"&&np<2&&!meHost&&Date.now()-GS.joinedAt>8000){b.hidden=false;b.textContent="Nobody else is in game "+GS.rc.toUpperCase()+" yet. Check that the code matches the one your friend sent."}
   else b.hidden=true}
 function monitor(){clearInterval(GS.mon);GS.mon=setInterval(function(){if(!ROOM)return;
   var c=true;try{c=ROOM.connected?ROOM.connected():true}catch(e){}
   if(!c){if(!GS.downSince)GS.downSince=Date.now()}else GS.downSince=0;updConn()},1000)}
-function enterRoom(room,code,name){ROOM=room;GS.solo=!!room.stub;GS.connErr=null;GS.downSince=0;GS.joinedAt=Date.now();$("gRoomCode").textContent=code;GS.ignoreG=null;GS.G=null;GS.rc=code;monitor();
-  pres({n:name,t:ROOM.now?ROOM.now():Date.now(),st:"lobby",rc:code});
+function enterRoom(room,code,name,creator){ROOM=room;GS.solo=!!room.stub;GS.connErr=null;GS.downSince=0;GS.joinedAt=Date.now();$("gRoomCode").textContent=code.toUpperCase();$("gShare").hidden=GS.solo;$("gShareMsg").textContent=GS.solo?"":(creator?"Send this code (or the invite link) to your friends. You can start once they appear below.":"");GS.ignoreG=null;GS.G=null;GS.rc=code;monitor();
+  pres({n:name,t:ROOM.now?ROOM.now():Date.now(),st:"lobby",rc:code,h:creator?1:null});
   UNSUB=ROOM.onPeers(onNet,function(e){GS.connErr=(e&&e.code)||"error";updConn()});
   scr("lobby");onNet()}
-async function doJoin(){var name=cleanName($("gName").value),code=($("gCode").value||"").toLowerCase().replace(/[^a-z0-9_.-]/g,"").replace(/^[^a-z0-9]+/,"").slice(0,20);
-  if(!name){msg("Enter your name.");return}
-  if(!code){msg("Enter a room code.");return}
+function newCode(){var a="abcdefghjkmnpqrstuvwxyz23456789",c="";for(var i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
+function doCreate(){doJoin(newCode(),true)}
+async function doJoin(code,creator){var name=cleanName($("gName").value);
+  if(typeof code!=="string")code=($("gCode").value||"").toLowerCase().replace(/[^a-z0-9_.-]/g,"").replace(/^[^a-z0-9]+/,"").slice(0,20);
+  if(!name){msg("Enter your name first.");$("gName").focus();return}
+  if(!code){msg("Enter the game code your friend sent you.");$("gCode").focus();return}
   try{localStorage.setItem("fq-name",name)}catch(e){}
   $("gMsg").className="fb";$("gMsg").textContent="Connecting…";
   var room=null;try{room=(window.claude&&window.claude.use)?await window.claude.use("room"):null}catch(e){}
   if(!room){msg("Could not reach the game server. Wait a minute and try again, or play solo.");return}
   var nr=room;
-  $("gMsg").textContent="";GS.challenge=false;enterRoom(nr,code,name)}
-function doSolo(){var name=cleanName($("gName").value)||"You";GS.challenge=false;enterRoom(stubRoom(),"solo",name)}
-function leaveRoom(){clearInterval(GS.mon);clearInterval(GS.tick);GS.tick=null;GS.adv=false;try{if(UNSUB)UNSUB()}catch(e){}try{if(ROOM&&!GS.solo){pres({t:null,rc:null,st:null,g:null,cfg:null,a:null,s:null,c:null,ms:null,n:null});if(typeof ROOM.leave==="function")ROOM.leave()}}catch(e){}ROOM=null;UNSUB=null;GS.G=null;GS.challenge=false;scr("join")}
+  $("gMsg").textContent="";enterRoom(nr,code,name,!!creator)}
+function doSolo(){var name=cleanName($("gName").value)||"You";enterRoom(stubRoom(),"solo",name,true)}
+function copyLink(){var u=location.origin+location.pathname+"?game="+encodeURIComponent(GS.rc.toUpperCase());
+  function done(){$("gShareMsg").textContent="Invite link copied. Paste it to your friends."}
+  try{navigator.clipboard.writeText(u).then(done,function(){$("gShareMsg").textContent=u})}catch(e){$("gShareMsg").textContent=u}}
+function leaveRoom(){clearInterval(GS.mon);clearInterval(GS.tick);GS.tick=null;GS.adv=false;try{if(UNSUB)UNSUB()}catch(e){}try{if(ROOM&&!GS.solo){pres({t:null,rc:null,h:null,st:null,g:null,cfg:null,a:null,s:null,c:null,ms:null,n:null});if(typeof ROOM.leave==="function")ROOM.leave()}}catch(e){}ROOM=null;UNSUB=null;GS.G=null;scr("join")}
 function backToLobby(){clearInterval(GS.tick);GS.tick=null;GS.adv=false;GS.pending=null;
   pres({st:"lobby",g:null,cfg:null,a:0,s:0,c:0,ms:0});scr("lobby");onNet()}
 
-function renderLobby(ps){var box=$("gPlayers");box.innerHTML="";var h=hostOf(ps);
+function renderLobby(ps){var box=$("gPlayers");box.innerHTML="";var h=hostOf(ps);$("gCount").textContent="Players ("+ps.length+")";
   ps.forEach(function(p){var s=document.createElement("span");if(p.sameTab)s.className="me";s.textContent=(h&&p.peer===h.peer?"★ ":"")+nm(p)+(p.sameTab?" (you)":"");box.appendChild(s)});
   var isHost=!!(h&&h.sameTab);$("gCfg").hidden=!isHost;
-  $("gWait").hidden=isHost;if(!isHost&&h)$("gWait").textContent="Waiting for "+nm(h)+" (host) to start the game.";
+  $("gWait").hidden=isHost;if(!isHost&&h)$("gWait").textContent="You're in! Waiting for "+nm(h)+" (host) to start the quiz.";
   $("gSpec").hidden=!(h&&h.presence.st==="play"&&GS.ignoreG&&h.presence.g===GS.ignoreG)}
 function startGame(){var cfg={tn:$("cTn").value,set:$("cSet").value,kind:$("cKind").value,n:parseInt($("cN").value,10),seed:Math.floor(Math.random()*2147483647)};
   var g="g"+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36);beginGame(g,cfg,true)}
@@ -727,7 +696,7 @@ function tickFn(){if(GS.screen!=="play"||GS.i<0)return;var el=Date.now()-GS.show
 function finish(){clearInterval(GS.tick);GS.tick=null;pres({st:"done",a:GS.n});scr("end");onNet()}
 
 /* ---------- network updates ---------- */
-function renderEnd(){$("gChal").hidden=!GS.challenge;$("gBack").hidden=!!GS.challenge;$("gFinal").hidden=!!GS.challenge;if(GS.challenge){renderChal();return}var ps=inGame();renderBoard($("gFinal"),ps);
+function renderEnd(){var ps=inGame();renderBoard($("gFinal"),ps);
   var done=ps.length>0&&ps.every(function(p){return p.presence.st==="done"});var w=$("gWin");
   if(!done){w.textContent="Final scores so far. Waiting for others to finish…"}
   else{var s=sorted(ps),top=s[0],tie=s.filter(function(p){return(p.presence.s||0)===(top.presence.s||0)&&(p.presence.ms||0)===(top.presence.ms||0)});
@@ -739,18 +708,19 @@ function onNet(){if(!ROOM)return;var ps=players(),h=hostOf(ps);updConn();
       if(maxA===0&&h.presence.cfg)beginGame(g,h.presence.cfg,false);else{GS.ignoreG=g;renderLobby(ps)}}}
   else if(GS.screen==="play"){renderBoard($("gBoard"),inGame());checkAdvance()}
   else if(GS.screen==="end"){renderEnd();
-    var nb=$("gNew");nb.hidden=true;
     if(h&&h.presence.st==="play"&&h.presence.g&&h.presence.g!==GS.G&&h.presence.cfg){var mx=0;ps.forEach(function(p){if(p.presence.g===h.presence.g)mx=Math.max(mx,p.presence.a||0)});
-      if(mx===0&&!GS.challenge){beginGame(h.presence.g,h.presence.cfg,false);return}}}}
+      if(mx===0){beginGame(h.presence.g,h.presence.cfg,false);return}}}}
 
 /* ---------- wiring ---------- */
 function app(m){$("practice").hidden=(m!=="prac");$("play").hidden=(m!=="play");$("aPrac").className=(m==="prac"?"on":"");$("aPlay").className=(m==="play"?"on":"")}
 $("aPrac").onclick=function(){app("prac")};$("aPlay").onclick=function(){app("play")};
-$("chCreate").onclick=createChallenge;$("chStart").onclick=startChallenge;$("chAdd").onclick=addResults;$("chCopy").onclick=copyResult;$("gJoinBtn").onclick=doJoin;$("gSoloBtn").onclick=doSolo;$("gStart").onclick=startGame;
+$("gCreateBtn").onclick=doCreate;$("gCopyLink").onclick=copyLink;$("gJoinBtn").onclick=function(){doJoin()};$("gSoloBtn").onclick=doSolo;$("gStart").onclick=startGame;
 $("gLeave").onclick=leaveRoom;$("gLeave2").onclick=leaveRoom;$("gBack").onclick=backToLobby;
-$("gNewBtn").onclick=function(){if(GS.pending)beginGame(GS.pending.g,GS.pending.cfg,false)};
 $("gCode").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doJoin()}});
 try{var sv=localStorage.getItem("fq-name");if(sv)$("gName").value=sv}catch(e){}
+// invite link: ?game=CODE opens the friends tab with the code filled in
+try{var inv=new URLSearchParams(location.search).get("game");if(inv){app("play");$("gCode").value=inv.toUpperCase().slice(0,20);
+  $("gMsg").className="fb";$("gMsg").textContent="Enter your name and press Join game.";if(!$("gName").value)$("gName").focus()}}catch(e){}
 })();
 </script>
 </body>
